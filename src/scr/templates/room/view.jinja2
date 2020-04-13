@@ -1,0 +1,8 @@
+{% extends 'scr:templates/layout.jinja2' %}
+
+{% block title %}{{ room.name }}{% endblock title %}
+
+{% block body %}
+<p>You are entering room {{ room.name }}{% if role.role == 'host' %} as host{% endif %}.</p>
+<p>Room URL: {{ room.jitsi_room }}, Room Password: {{ room.jitsi_password }}.</p>
+{% endblock body %}

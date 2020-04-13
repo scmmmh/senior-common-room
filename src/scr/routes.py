@@ -1,6 +1,7 @@
 import json
 
 from base64 import urlsafe_b64encode, urlsafe_b64decode
+from pyramid_jinja2.filters import route_url_filter, static_url_filter
 
 
 def encode_route(request):
@@ -32,3 +33,12 @@ def includeme(config):
 
     config.add_route('user.login', '/users/login')
     config.add_route('user.logout', '/users/logout')
+
+    config.add_route('room.create', '/rooms/create')
+    config.add_route('room.view', '/rooms/:rid')
+
+    # Jinja2 configuration
+    config.get_jinja2_environment().filters['static_url'] = static_url_filter
+    config.get_jinja2_environment().filters['route_url'] = route_url_filter
+    config.get_jinja2_environment().filters['encode_route'] = encode_route
+    config.get_jinja2_environment().filters['decode_route'] = decode_route

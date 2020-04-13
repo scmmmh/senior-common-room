@@ -1,7 +1,5 @@
-from datetime import datetime
 from sqlalchemy import (Column, Index, Integer, Unicode, ForeignKey)
 from sqlalchemy.orm import relationship
-from sqlalchemy_json import NestedMutableJson
 
 from .meta import Base
 
@@ -14,6 +12,9 @@ class RoomRole(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     room_id = Column(Integer, ForeignKey('rooms.id'))
     role = Column(Unicode(255))
+
+    room = relationship('Room')
+    user = relationship('User')
 
 
 Index('room_roles_ids_ix', RoomRole.user_id, RoomRole.room_id)

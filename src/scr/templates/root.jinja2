@@ -1,8 +1,31 @@
 {% extends "layout.jinja2" %}
 
-{% block content %}
-<div class="content">
-  <h1><span class="font-semi-bold">Pyramid</span> <span class="smaller">Alchemy scaffold</span></h1>
-  <p class="lead">Welcome to <span class="font-normal">{{project}}</span>, an&nbsp;application generated&nbsp;by<br>the <span class="font-normal">Pyramid Web Framework 1.10.4</span>.</p>
+{% block body %}
+<div class="grid-container">
+  <main class="grid-x">
+    <div class="cell small-12">
+      <h1>Rooms</h1>
+      <a href="{{ 'room.create'|route_url() }}" class="button">Create</a>
+      <ul class="no-bullet flex-container">
+        {% for room_role in request.current_user.rooms %}
+          <li class="card flex-child-shrink">
+            <div class="card-section">
+              <h2>{{ room_role.room.name }}</h2>
+              <p>{{ room_role.room.users|length }} person in the room</p>
+            </div>
+            <div class="card-divider">
+              <ul class="menu inline">
+                {% if room_role.role == 'host' %}
+                  <li><a href="" class="button secondary small">Edit</a></li>
+                  <li><a href="" class="button secondary small">Delete</a></li>
+                {% endif %}
+                <li><a href="{{ 'room.view'|route_url(rid=room_role.room.id) }}" class="button small">Enter Room</a></li>
+              </ul>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </main>
 </div>
-{% endblock content %}
+{% endblock body %}

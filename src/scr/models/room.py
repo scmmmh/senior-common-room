@@ -1,7 +1,6 @@
 from datetime import datetime
 from sqlalchemy import (Column, Index, Integer, Unicode, DateTime)
 from sqlalchemy.orm import relationship
-from sqlalchemy_json import NestedMutableJson
 
 from .meta import Base
 
@@ -15,6 +14,9 @@ class Room(Base):
     slug = Column(Unicode(191))
     jitsi_password = Column(Unicode(255))
     jitsi_room = Column(Unicode(255))
+    created = Column(DateTime, default=datetime.now)
+
+    users = relationship('RoomRole', cascade="all, delete-orphan")
 
     def allow(self, user, action):
         """Check whether the given user is allowed to undertake the given action.

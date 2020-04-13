@@ -20,6 +20,8 @@ class User(Base):
     attributes = Column(NestedMutableJson)
     created = Column(DateTime, default=datetime.now)
 
+    rooms = relationship('RoomRole')
+
     def allow(self, user, action):
         """Check whether the given user is allowed to undertake the given action.
 
