@@ -34,8 +34,6 @@ DYNAMIC_ID = 5
 def class_lookup(class_name):
     if class_name == 'user':
         return User
-    elif class_name == 'image':
-        return Image
     raise Exception('Unknown class {0}'.format(class_name))
 
 

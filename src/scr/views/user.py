@@ -1,17 +1,12 @@
-from copy import deepcopy
 from email_validator import validate_email, EmailNotValidError
 from hashlib import sha512
-from math import ceil
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
-from random import sample, choice
-from secrets import token_hex
 from sqlalchemy import and_
 
 from ..models import User
-from ..permissions import require_permission, check_permission, PERMISSIONS, GROUPS
 from ..routes import decode_route
-from ..util import get_config_setting, send_email, Validator
+from ..util import Validator
 
 
 def valid_email(field, value, error):
@@ -31,7 +26,7 @@ def valid_email(field, value, error):
 login_schema = {'email': {'type': 'string', 'empty': False, 'validator': valid_email},
                 'password': {'type': 'string', 'empty': False},
                 'redirect': {'type': 'string'},
-                'csrf_token': {'type': 'string'},}
+                'csrf_token': {'type': 'string'}}
 
 
 @view_config(route_name='user.login', renderer='scr:templates/users/login.jinja2')
@@ -47,7 +42,6 @@ def login(request):
                 hash.update(user.salt.encode('utf-8'))
                 hash.update(b'$$')
                 hash.update(request.params['password'].encode('utf-8'))
-                print('Hm')
                 if user.password == hash.hexdigest():
                     request.session['user-id'] = user.id
                     return HTTPFound(location=decode_route(request, 'user.view', {'uid': user.id}))
