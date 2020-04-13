@@ -1,0 +1,15 @@
+{
+  "name": "senior-common-room",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "foundation-sites": "^6.6.3",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-sass": "^4.0.2",
+    "pump": "^3.0.0"
+  }
+}

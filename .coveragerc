@@ -1,0 +1,3 @@
+[run]
+source = senior_common_room
+omit = senior_common_room/test*

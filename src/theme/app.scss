@@ -1,0 +1,23 @@
+/* Basic Settings */
+@import 'settings';
+@import 'foundation';
+
+@include foundation-everything;
+
+.button-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    a, button {
+        margin-left: $global-margin;
+
+        &:last-child {
+            margin-left: $global-margin * 3;
+        }
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}

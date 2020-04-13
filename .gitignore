@@ -1,0 +1,8 @@
+node_modules
+.venv
+.vscode
+development.ini
+production.ini
+*.sqlite
+*.egg-info
+__pycache__
