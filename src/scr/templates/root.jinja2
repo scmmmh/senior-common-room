@@ -11,12 +11,18 @@
           <li class="card flex-child-shrink">
             <div class="card-section">
               <h2>{{ room_role.room.name }}</h2>
-              <p>{{ room_role.room.users|length }} person in the room</p>
+              <p>
+                {% trans count=room_role.room.users|length %}
+                  There is {{ count }} person signed up to the room.
+                {% pluralize %}
+                  There are {{ count }} people signed up to the room.
+                {% endtrans %}
+              </p>
             </div>
             <div class="card-divider">
               <ul class="menu inline">
                 {% if room_role.role == 'host' %}
-                  <li><a href="" class="button secondary small">Edit</a></li>
+                  <li><a href="{{ 'room.edit'|route_url(rid=room_role.room.id) }}" class="button secondary small">Edit</a></li>
                   <li><a href="" class="button secondary small">Delete</a></li>
                 {% endif %}
                 <li><a href="{{ 'room.view'|route_url(rid=room_role.room.slug) }}" class="button small">Enter Room</a></li>
