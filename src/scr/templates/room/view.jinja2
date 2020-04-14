@@ -3,6 +3,31 @@
 {% block title %}{{ room.name }}{% endblock title %}
 
 {% block body %}
-<p>You are entering room {{ room.name }}{% if role.role == 'host' %} as host{% endif %}.</p>
-<p>Room URL: {{ room.jitsi_room }}, Room Password: {{ room.jitsi_password }}.</p>
+<div id="jitsi"></div>
+<script src="https://{{ request|config('jitsi.meet.url') }}/external_api.js"></script>
+<script>
+const domain = '{{ request|config('jitsi.meet.url') }}';
+const options = {
+    roomName: '{{ room.jitsi_room }}',
+    parentNode: document.querySelector('#jitsi'),
+    userInfo: {
+        email: '{{ request.current_user.email }}',
+        displayName: '{{ request.current_user.attributes.name }}',
+    },
+};
+{% if jwt %}
+options.jwt = '{{ jwt }}';
+{% endif %}
+const api = new JitsiMeetExternalAPI(domain, options);
+api.executeCommand('subject', '{{ room.name }}');
+api.executeCommand('displayName', '{{ request.current_user.attributes.name }}');
+setTimeout(function() {
+    console.log('Setting password');
+    api.executeCommand('password', '{{ room.jitsi_password }}');
+}, 10000);
+api.addEventListener('readyToClose', function() {
+    api.dispose();
+    window.location = '{{ request.route_url('room.close', rid=room.id) }}';
+});
+</script>
 {% endblock body %}

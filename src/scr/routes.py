@@ -37,6 +37,7 @@ def includeme(config):
     config.add_route('room.create', '/rooms/create')
     config.add_route('room.view', '/rooms/:rid')
     config.add_route('room.edit', '/rooms/:rid/edit')
+    config.add_route('room.close', '/rooms/:rid/close')
 
     # Jinja2 configuration
     config.get_jinja2_environment().filters['static_url'] = static_url_filter

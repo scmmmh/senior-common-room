@@ -1,5 +1,7 @@
+import jwt
 import re
 
+from datetime import datetime, timedelta
 from pyramid.httpexceptions import HTTPNotFound, HTTPFound
 from pyramid.view import view_config
 from secrets import token_hex
@@ -7,7 +9,7 @@ from sqlalchemy import and_
 
 from ..session import require_logged_in
 from ..models import Room, RoomRole, User
-from ..util import Validator
+from ..util import Validator, get_config_setting
 
 
 def slugify(text):
@@ -67,13 +69,24 @@ def view(request):
             first()
     if result:
         room, role = result
-        if role.role == 'host' and room.jitsi_room is None:
-            room.jitsi_room = token_hex(32)
-            room.jitsi_password = token_hex(8)
-            request.dbsession.add(room)
-            request.dbsession.flush()
+        token = None
+        if role.role == 'host':
+            if room.jitsi_room is None:
+                room.jitsi_room = token_hex(32)
+                room.jitsi_password = token_hex(8)
+                request.dbsession.add(room)
+                request.dbsession.flush()
+            payload = {'iss': get_config_setting(request, 'jitsi.meet.app_id'),
+                       'aud': get_config_setting(request, 'jitsi.meet.app_id'),
+                       'room': room.jitsi_room,
+                       'exp': (datetime.now() + timedelta(minutes=5)).timestamp(),
+                       'sub': get_config_setting(request, 'jitsi.meet.url')}
+            token = jwt.encode(payload,
+                               get_config_setting(request, 'jitsi.meet.secret'),
+                               algorithm='HS256').decode('utf-8')
         return {'room': room,
-                'role': role}
+                'role': role,
+                'jwt': token}
     else:
         raise HTTPNotFound()
 
@@ -108,7 +121,8 @@ def edit(request):
             validator = Validator(edit_room_schema)
             if validator.validate(request.params):
                 slug = slugify(request.params['name'])
-                existing = request.dbsession.query(Room).filter(and_(Room.slug == slug, Room.id != request.matchdict['rid'])).first()
+                existing = request.dbsession.query(Room).filter(and_(Room.slug == slug,
+                                                                     Room.id != request.matchdict['rid'])).first()
                 if existing:
                     return {'room': room, 'users': users, 'errors': validator.errors, 'values': request.params}
                 room.name = request.params['name']
@@ -145,8 +159,28 @@ def edit(request):
                 request.dbsession.add(room)
                 return HTTPFound(request.route_url('root'))
             else:
-                return {'room': room, 'users': users, 'errors': {'name': ['A room with this name already exists']}, 'values': request.params}
+                return {'room': room,
+                        'users': users,
+                        'errors': {'name': ['A room with this name already exists']},
+                        'values': request.params}
         return {'room': room,
                 'users': users}
     else:
         raise HTTPNotFound()
+
+
+@view_config(route_name='room.close')
+@require_logged_in()
+def close(request):
+    room = request.dbsession.query(Room).\
+        join(RoomRole).filter(and_(Room.id == request.matchdict['rid'],
+                                   RoomRole.user_id == request.current_user.id,
+                                   RoomRole.role == 'host')).\
+        first()
+    if room:
+        room.jitsi_room = None
+        room.jitsi_password = None
+        request.dbsession.add(room)
+        return HTTPFound(request.route_url('root'))
+    else:
+        return HTTPFound(request.route_url('root'))

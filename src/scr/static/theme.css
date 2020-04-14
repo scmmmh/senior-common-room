@@ -4810,3 +4810,11 @@ html.is-reveal-open {
       margin-left: 3rem; }
     .button-list a:first-child, .button-list button:first-child {
       margin-left: 0; }
+
+#jitsi {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; }
