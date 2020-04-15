@@ -208,3 +208,20 @@ def close(request):
         return HTTPFound(request.route_url('root'))
     else:
         return HTTPFound(request.route_url('root'))
+
+
+@view_config(route_name='room.delete', renderer='scr:templates/room/delete.jinja2')
+@require_logged_in()
+def delete(request):
+    room = request.dbsession.query(Room).\
+        join(RoomRole).filter(and_(Room.id == request.matchdict['rid'],
+                                   RoomRole.user_id == request.current_user.id,
+                                   RoomRole.role == 'host')).\
+        first()
+    if room:
+        if request.method == 'POST':
+            request.dbsession.delete(room)
+            return HTTPFound(request.route_url('root'))
+        return {'room': room}
+    else:
+        raise HTTPNotFound()

@@ -23,7 +23,7 @@
               <ul class="menu inline">
                 {% if room_role.role == 'host' %}
                   <li><a href="{{ 'room.edit'|route_url(rid=room_role.room.id) }}" class="button secondary small">Edit</a></li>
-                  <li><a href="" class="button secondary small">Delete</a></li>
+                  <li><a href="{{ 'room.delete'|route_url(rid=room_role.room.id) }}" class="button secondary small">Delete</a></li>
                 {% endif %}
                 <li><a href="{{ 'room.view'|route_url(rid=room_role.room.slug) }}" class="button small">Enter Room</a></li>
               </ul>
