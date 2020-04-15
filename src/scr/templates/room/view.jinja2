@@ -21,10 +21,15 @@ options.jwt = '{{ jwt }}';
 const api = new JitsiMeetExternalAPI(domain, options);
 api.executeCommand('subject', '{{ room.name }}');
 api.executeCommand('displayName', '{{ request.current_user.attributes.name }}');
-setTimeout(function() {
-    console.log('Setting password');
+const pwdTimeout = setTimeout(function() {
     api.executeCommand('password', '{{ room.jitsi_password }}');
 }, 10000);
+api.addEventListener('videoConferenceJoined', function() {
+    clearTimeout(pwdTimeout);
+    setTimeout(function() {
+        api.executeCommand('password', '{{ room.jitsi_password }}');
+    }, 1000);
+});
 api.addEventListener('readyToClose', function() {
     api.dispose();
     window.location = '{{ request.route_url('room.close', rid=room.id) }}';
