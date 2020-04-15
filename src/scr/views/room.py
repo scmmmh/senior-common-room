@@ -21,7 +21,7 @@ def slugify(text):
             slug.append('-')
     slug = ''.join(slug)
     while '--' in slug:
-        slug.replace('--', '-')
+        slug = slug.replace('--', '-')
     return slug.lower()
 
 
