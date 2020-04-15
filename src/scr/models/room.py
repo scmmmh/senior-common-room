@@ -14,6 +14,7 @@ class Room(Base):
     slug = Column(Unicode(191))
     jitsi_password = Column(Unicode(255))
     jitsi_room = Column(Unicode(255))
+    guest_password = Column(Unicode(255))
     created = Column(DateTime, default=datetime.now)
 
     users = relationship('RoomRole', cascade="all, delete-orphan")
