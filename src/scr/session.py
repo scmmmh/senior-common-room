@@ -39,7 +39,7 @@ def logged_in(request):
 def includeme(config):
     """Setup the session handling in the configuration."""
     secret = unhexlify(config.get_settings()['app.session_secret'].strip())
-    factory = EncryptedCookieSessionFactory(secret, cookie_name='toja', timeout=86400)
+    factory = EncryptedCookieSessionFactory(secret, cookie_name='toja', timeout=2592000)
     config.set_session_factory(factory)
     config.set_csrf_storage_policy(SessionCSRFStoragePolicy())
     config.set_default_csrf_options(require_csrf=True)
