@@ -84,12 +84,36 @@ def view(request):
             token = jwt.encode(payload,
                                get_config_setting(request, 'jitsi.meet.secret'),
                                algorithm='HS256').decode('utf-8')
+        else:
+            if room.jitsi_room is None:
+                return HTTPFound(request.route_url('room.lobby', rid=room.slug))
         return {'room': room,
                 'role': role,
                 'jwt': token}
     else:
         raise HTTPNotFound()
 
+
+@view_config(route_name='room.lobby', renderer='scr:templates/room/lobby.jinja2')
+@require_logged_in()
+def lobby(request):
+    if re.match('[0-9]+', request.matchdict['rid']):
+        result = request.dbsession.query(Room, RoomRole).\
+            join(RoomRole).filter(and_(Room.id == request.matchdict['rid'],
+                                       RoomRole.user_id == request.current_user.id)).\
+            first()
+    else:
+        result = request.dbsession.query(Room, RoomRole).\
+            join(RoomRole).filter(and_(Room.slug == request.matchdict['rid'],
+                                       RoomRole.user_id == request.current_user.id)).\
+            first()
+    if result:
+        room, role = result
+        if role.role == 'host' or room.jitsi_room is not None:
+            return HTTPFound(request.route_url('room.view', rid=room.slug))
+        return {'room': room}
+    else:
+        raise HTTPNotFound()
 
 edit_room_schema = {'name': {'type': 'string', 'empty': False},
                     'host': {'type': 'string'},
