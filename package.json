@@ -5,11 +5,14 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@vue/cli": "^4.5.6",
     "foundation-sites": "^6.6.3",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.1",
     "gulp-concat": "^2.6.1",
     "gulp-sass": "^4.0.2",
     "pump": "^3.0.0"
-  }
+  },
+  "repository": "https://github.com/scmmmh/senior-common-room.git",
+  "author": "Mark <mark.hall@work.room3b.eu>"
 }

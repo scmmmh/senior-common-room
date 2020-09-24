@@ -6,3 +6,4 @@ production.ini
 *.sqlite
 *.egg-info
 __pycache__
+src/scr/static
