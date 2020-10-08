@@ -5,6 +5,7 @@ import os
 from tornado.web import RedirectHandler
 
 from .db import setup_db
+from .handlers.web import ClientAPIHandler
 
 
 def make_app():
@@ -19,6 +20,7 @@ def make_app():
 
     return tornado.web.Application([
         (r'/', RedirectHandler, {'url': '/static/', 'permanent': False}),
+        ('/websocket', ClientAPIHandler),
     ], **settings)
 
 
