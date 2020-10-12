@@ -95,10 +95,10 @@ export default createStore({
         connect({ state, commit, dispatch }) {
             return new Promise((resolve, reject) => {
                 if (state.connection.state === 0) {
-                    commit('setConnectionState', 1);
+                    commit('setConnectionState', BUSY);
                     const websocket = new WebSocket('ws://localhost:6543/websocket');
                     websocket.addEventListener('open', () => {
-                        commit('setConnectionState', 2);
+                        commit('setConnectionState', READY);
                         commit('setWebSocket', websocket);
                         resolve();
                     });
@@ -116,7 +116,7 @@ export default createStore({
                         reject();
                     });
                 } else if (state.connection.state === 1) {
-
+                    commit('setConnectionStatus', BUSY);
                 } else if (state.connection.state === 2) {
                     resolve();
                 }
