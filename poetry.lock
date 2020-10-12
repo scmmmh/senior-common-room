@@ -25,6 +25,17 @@ version = ">=1.4.0,<1.5"
 
 [[package]]
 category = "main"
+description = "Idomatic asyncio wrapper around paho-mqtt."
+name = "asyncio-mqtt"
+optional = false
+python-versions = "*"
+version = "0.7.0"
+
+[package.dependencies]
+paho-mqtt = ">=1.5.0"
+
+[[package]]
+category = "main"
 description = "An asyncio PostgreSQL driver"
 name = "asyncpg"
 optional = false
@@ -164,6 +175,17 @@ python-versions = "*"
 version = "1.5.0"
 
 [[package]]
+category = "main"
+description = "MQTT version 5.0/3.1.1 client class"
+name = "paho-mqtt"
+optional = false
+python-versions = "*"
+version = "1.5.1"
+
+[package.extras]
+proxy = ["pysocks"]
+
+[[package]]
 category = "dev"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 name = "pre-commit"
@@ -299,7 +321,8 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "914553f06f4520fda17a37cb5412decb5c79013d511a99012e829c229a75a414"
+content-hash = "1c42ddbf3b21714c9441ef79ba4651e9b59eb85fd8680a9a0d333e40e115b0ed"
+lock-version = "1.0"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -310,6 +333,10 @@ appdirs = [
 astroid = [
     {file = "astroid-2.4.2-py3-none-any.whl", hash = "sha256:bc58d83eb610252fd8de6363e39d4f1d0619c894b0ed24603b881c02e64c7386"},
     {file = "astroid-2.4.2.tar.gz", hash = "sha256:2f4078c2a41bf377eea06d71c9d2ba4eb8f6b1af2135bec27bbbb7d8f12bb703"},
+]
+asyncio-mqtt = [
+    {file = "asyncio_mqtt-0.7.0-py3-none-any.whl", hash = "sha256:eed08ad8f8f3c6b83987e43629b81c4a491c082b3eebb40c14061d72024376a9"},
+    {file = "asyncio_mqtt-0.7.0.tar.gz", hash = "sha256:d945c37e549ada03d826705cf868617e97a69cf91ef09fea3381a27ffe31f691"},
 ]
 asyncpg = [
     {file = "asyncpg-0.21.0-cp35-cp35m-macosx_10_13_x86_64.whl", hash = "sha256:09badce47a4645cfe523cc8a182bd047d5d62af0caaea77935e6a3c9e77dc364"},
@@ -403,6 +430,9 @@ mccabe = [
 nodeenv = [
     {file = "nodeenv-1.5.0-py2.py3-none-any.whl", hash = "sha256:5304d424c529c997bc888453aeaa6362d242b6b4631e90f3d4bf1b290f1c84a9"},
     {file = "nodeenv-1.5.0.tar.gz", hash = "sha256:ab45090ae383b716c4ef89e690c41ff8c2b257b85b309f01f3654df3d084bd7c"},
+]
+paho-mqtt = [
+    {file = "paho-mqtt-1.5.1.tar.gz", hash = "sha256:9feb068e822be7b3a116324e01fb6028eb1d66412bf98595ae72698965cb1cae"},
 ]
 pre-commit = [
     {file = "pre_commit-2.7.1-py2.py3-none-any.whl", hash = "sha256:810aef2a2ba4f31eed1941fc270e72696a1ad5590b9751839c90807d0fff6b9a"},

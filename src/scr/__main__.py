@@ -1,3 +1,4 @@
+import asyncpg
 import importlib
 import tornado.ioloop
 import os
@@ -8,7 +9,7 @@ from .db import setup_db
 from .handlers.web import ClientAPIHandler
 
 
-def make_app():
+async def make_app():
     settings = {
         'debug': True,
         'static_path': os.path.join(os.path.dirname(importlib.machinery.PathFinder().
@@ -16,16 +17,17 @@ def make_app():
                                     'static'),
         'static_handler_args': {'default_filename': 'index.html'},
         'include_version': False,
+        'pool': await asyncpg.create_pool(dsn='postgresql://dev:devPWD@localhost/senior-common-room'),
     }
 
-    return tornado.web.Application([
+    app = tornado.web.Application([
         (r'/', RedirectHandler, {'url': '/static/', 'permanent': False}),
         ('/websocket', ClientAPIHandler),
     ], **settings)
+    app.listen(6543)
 
 
 if __name__ == "__main__":
-    app = make_app()
-    app.listen(6543)
     tornado.ioloop.IOLoop.current().add_callback(setup_db)
+    tornado.ioloop.IOLoop.current().add_callback(make_app)
     tornado.ioloop.IOLoop.current().start()

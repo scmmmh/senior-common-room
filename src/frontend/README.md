@@ -1,4 +1,4 @@
-# senior-common-room
+# frontend
 
 ## Project setup
 ```

@@ -2,6 +2,7 @@ const gulp = require('gulp'),
       sass = require('gulp-sass'),
       autoprefixer = require('gulp-autoprefixer'),
       concat = require('gulp-concat'),
+      { spawn } = require('child_process'),
       pump = require('pump');
 
 gulp.task('frontend:plugins', function(cb) {
@@ -12,7 +13,15 @@ gulp.task('frontend:plugins', function(cb) {
     ], cb);
 });
 
-gulp.task('frontend', gulp.parallel('frontend:plugins'));
+gulp.task('frontend:build', function(cb) {
+    const builder = spawn('yarn', ['build', '--mode', 'development', '--watch', '--no-clean', '--dest', '../scr/static'], {
+        cwd: 'src/frontend',
+        stdio: 'inherit',
+    });
+    builder.on('exit', cb);
+});
+
+gulp.task('frontend', gulp.parallel('frontend:plugins', 'frontend:build'));
 
 gulp.task('theme:static', function(cb) {
     pump([
