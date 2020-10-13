@@ -106,17 +106,17 @@ export default createStore({
                         dispatch('receiveMessage', JSON.parse(ev.data));
                     });
                     websocket.addEventListener('close', () => {
-                        commit('setConnectionStatus', NOT_READY);
+                        commit('setConnectionState', NOT_READY);
                         dispatch('disconnect');
                     });
                     websocket.addEventListener('error', () => {
-                        commit('setConnectionStatus', NOT_READY);
+                        commit('setConnectionState', NOT_READY);
                         dispatch('disconnect');
                         dispatch('reconnect');
                         reject();
                     });
                 } else if (state.connection.state === 1) {
-                    commit('setConnectionStatus', BUSY);
+                    commit('setConnectionState', BUSY);
                 } else if (state.connection.state === 2) {
                     resolve();
                 }
@@ -144,7 +144,6 @@ export default createStore({
         },
 
         async receiveMessage({ dispatch }, payload: WebSocketMessage) {
-            console.log(payload);
             if (payload.type === 'notAuthenticated') {
                 dispatch('authenticate');
             } else if (payload.type === 'authenticated') {

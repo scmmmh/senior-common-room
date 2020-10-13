@@ -1,6 +1,10 @@
+import asyncio
+import asyncio_mqtt
 import asyncpg
 import json
+import tornado.ioloop
 
+from contextlib import AsyncExitStack
 from hashlib import sha3_256
 from secrets import token_hex
 
@@ -8,24 +12,43 @@ from tornado.websocket import WebSocketHandler
 
 
 class ClientAPIHandler(WebSocketHandler):
-    def open(self):
-        print("WebSocket opened")
+    async def open(self):
         self.access_token = None
         self.send_message({'type': 'notAuthenticated'})
+        self.mqtt = asyncio_mqtt.Client('localhost')
+        self.tasks = {'rooms': {}}
+        await self.mqtt.connect()
 
     async def on_message(self, message):
         data = json.loads(message)
         if data['type'] == 'authenticate':
             await self.authenticate(data)
+        elif data['type'] == 'enterRoom':
+            self.tasks['rooms'][data['room']] = asyncio.create_task(self.enter_room(data['room']))
+        elif data['type'] == 'leaveRoom':
+            await self.leave_room(data['room'])
         else:
             print(message)
 
     def on_close(self):
-        print("WebSocket closed")
-        pass
+        for task in self.tasks['rooms'].values():
+            task.cancel()
+        asyncio.create_task(self.mqtt.disconnect())
 
     def send_message(self, data):
         self.write_message(json.dumps(data))
+
+    async def enter_room(self, room_name):
+        async with self.mqtt.filtered_messages(f'rooms/{room_name}') as messages:
+            await self.mqtt.subscribe(f'rooms/{room_name}')
+            async for msg in messages:
+                self.send_message({'type': 'test', 'data': msg.payload.decode()})
+
+    async def leave_room(self, room_name):
+        if room_name in self.tasks['rooms']:
+            await self.mqtt.unsubscribe(f'rooms/{room_name}')
+            self.tasks['rooms'][room_name].cancel()
+            del self.tasks['rooms'][room_name]
 
     async def authenticate(self, data):
         """Authenticate the user.
