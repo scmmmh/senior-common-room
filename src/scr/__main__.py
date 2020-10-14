@@ -1,5 +1,7 @@
+import click
 import asyncpg
 import importlib
+import logging
 import tornado.ioloop
 import os
 
@@ -7,6 +9,9 @@ from tornado.web import RedirectHandler
 
 from .db import setup_db
 from .handlers.web import ClientAPIHandler
+
+
+logger = logging.getLogger('scr')
 
 
 async def make_app():
@@ -27,7 +32,27 @@ async def make_app():
     app.listen(6543)
 
 
-if __name__ == "__main__":
+@click.group()
+@click.option('-v', '--verbose', count=True)
+def cli(verbose=0):
+    """Senior Common Room CLI"""
+    if verbose == 1:
+        logging.basicConfig(level=logging.INFO)
+    elif verbose > 1:
+        logging.basicConfig(level=logging.DEBUG)
+
+
+@click.command()
+def run_server():
+    """Run the SCR Server"""
+    logger.info('Server starting')
     tornado.ioloop.IOLoop.current().add_callback(setup_db)
     tornado.ioloop.IOLoop.current().add_callback(make_app)
+    logger.debug('Server running')
     tornado.ioloop.IOLoop.current().start()
+
+
+if __name__ == "__main__":
+    cli.add_command(run_server)
+
+    cli()
