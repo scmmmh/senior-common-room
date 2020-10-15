@@ -15,7 +15,8 @@ class ClientAPIHandler(WebSocketHandler):
     async def open(self):
         self.access_token = None
         self.send_message({'type': 'notAuthenticated'})
-        self.mqtt = asyncio_mqtt.Client('localhost')
+        self.mqtt = asyncio_mqtt.Client(self.application.settings['config'].get('mqtt', 'host'),
+                                        port=self.application.settings['config'].getint('mqtt', 'port'))
         self.tasks = {'rooms': {}}
         await self.mqtt.connect()
 

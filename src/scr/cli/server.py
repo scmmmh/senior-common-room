@@ -1,3 +1,4 @@
+import asyncio
 import asyncpg
 import click
 import importlib
@@ -13,22 +14,24 @@ from ..handlers.web import ClientAPIHandler
 logger = logging.getLogger('scr.server')
 
 
-async def make_app():
+async def make_app(config):
     settings = {
-        'debug': True,
+        'debug': config.getboolean('server', 'debug'),
         'static_path': os.path.join(os.path.dirname(importlib.machinery.PathFinder().
                                                     find_module('scr').get_filename()),
                                     'static'),
         'static_handler_args': {'default_filename': 'index.html'},
         'include_version': False,
-        'pool': await asyncpg.create_pool(dsn='postgresql://dev:devPWD@localhost/senior-common-room'),
+        'pool': await asyncpg.create_pool(dsn=config.get('database', 'dsn')),
+        'config': config,
     }
 
     app = tornado.web.Application([
         (r'/', RedirectHandler, {'url': '/static/', 'permanent': False}),
         ('/websocket', ClientAPIHandler),
     ], **settings)
-    app.listen(6543)
+    app.listen(port=config.getint('server', 'port'), address=config.get('server', 'host'))
+    logger.debug('Server listening')
 
 
 @click.group()
@@ -38,12 +41,13 @@ def server():
 
 
 @click.command()
-def run():
+@click.pass_context
+def run(ctx):
     """Run the SCR Server"""
     logger.info('Server starting')
-    tornado.ioloop.IOLoop.current().add_callback(setup_db)
-    tornado.ioloop.IOLoop.current().add_callback(make_app)
-    logger.debug('Server running')
+    loop = asyncio.get_event_loop()
+    loop.create_task(setup_db())
+    loop.create_task(make_app(ctx.obj['config']))
     tornado.ioloop.IOLoop.current().start()
 
 
