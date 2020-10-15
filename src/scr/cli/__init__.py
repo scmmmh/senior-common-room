@@ -7,6 +7,7 @@ from configparser import ConfigParser
 
 from .users import users
 from .server import server
+from .db import db
 
 
 logger = logging.getLogger('scr')
@@ -46,3 +47,4 @@ def cli(ctx, verbose, config):
 
 cli.add_command(server)
 cli.add_command(users)
+cli.add_command(db)

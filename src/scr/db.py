@@ -1,5 +1,8 @@
 import asyncpg
+import logging
 
+
+logger = logging.getLogger('scr.db')
 
 SCHEMAS = (
     ('scr_users', (
@@ -16,19 +19,43 @@ SCHEMAS = (
 )
 
 
-async def setup_db():
-    """Create / Upgrade the database schema."""
-    current_versions = {'scr_users': 0}
-    conn = await asyncpg.connect('postgresql://dev:devPWD@localhost/senior-common-room')
-    await conn.execute('CREATE TABLE IF NOT EXISTS scr_versions (name VARCHAR(255) PRIMARY KEY, version INTEGER)')
-    for result in await conn.fetch('''SELECT * FROM scr_versions'''):
-        current_versions[result['name']] = result['version']
-    for table_name, versions in SCHEMAS:
-        for version, statement in versions:
-            if version > current_versions[table_name]:
-                async with conn.transaction():
-                    await conn.execute(statement)
-                    await conn.execute('''INSERT INTO scr_versions VALUES($1, $2)
-                                          ON CONFLICT(name)
-                                          DO UPDATE SET version = EXCLUDED.version''', table_name, version)
-    await conn.close()
+async def create_update_db(config):
+    """Create / Update the database schema."""
+    logger.info('Starting the database create / update')
+    async with asyncpg.create_pool(dsn=config.get('database', 'dsn')) as pool:
+        async with pool.acquire() as conn:
+            current_versions = {'scr_users': 0}
+            await conn.execute('CREATE TABLE IF NOT EXISTS scr_versions (name VARCHAR(255) PRIMARY KEY, '+
+                               'version INTEGER)')
+            for result in await conn.fetch('''SELECT * FROM scr_versions'''):
+                current_versions[result['name']] = result['version']
+            for table_name, versions in SCHEMAS:
+                for version, statement in versions:
+                    if version > current_versions[table_name]:
+                        async with conn.transaction():
+                            logger.debug(f'Creating / Updating {table_name} to version {version}')
+                            await conn.execute(statement)
+                            await conn.execute('''INSERT INTO scr_versions VALUES($1, $2)
+                                                  ON CONFLICT(name)
+                                                  DO UPDATE SET version = EXCLUDED.version''', table_name, version)
+                            logger.debug(f'{table_name} at version {version}')
+    logger.info('Database creation / update complete')
+
+
+async def verify_db(pool):
+    """Verify that the database is up-to-date."""
+    logger.debug('Verifying that the database is up-to-date')
+    async with pool.acquire() as conn:
+        current_versions = {'scr_users': 0}
+        try:
+            for result in await conn.fetch('''SELECT * FROM scr_versions'''):
+                current_versions[result['name']] = result['version']
+            for table_name, versions in SCHEMAS:
+                if versions[-1][0] != current_versions[table_name]:
+                    logger.debug(f'Table {table_name} needs to be upgraded from version {current_versions[table_name]}' +
+                                 ' to {versions[-1][0]}')
+                    return False
+        except asyncpg.exceptions.UndefinedTableError:
+            logger.debug(f'Database needs to be initialised')
+            return False
+    return True

@@ -7,7 +7,7 @@ from hashlib import sha3_256
 from secrets import token_hex
 
 
-logger = logging.getLogger('scr.users')
+logger = logging.getLogger('scr.cli.users')
 
 
 async def add_user(config, email, name, password):
