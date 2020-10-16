@@ -1,0 +1,16 @@
+.button {
+    border: 1px solid transparent;
+    padding: $global-padding/4 $global-padding/2;
+    border-radius: rem-calc(3px);
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &.primary {
+        background: $primary-colour;
+        color: $white;
+
+        &:focus, &:hover {
+            background: adjust-color($primary-colour, $lightness: 10%);
+        }
+    }
+}

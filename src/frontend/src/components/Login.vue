@@ -1,31 +1,39 @@
 <template>
-    <div role="popup" id="login">
-        <h1>Senior Common Room - Login</h1>
-        <p v-if="isAuthenticating">Authentication in progress...</p>
-        <form v-else @submit="login">
-            <label>E-Mail
-                <input type="email" v-model="email"/>
-                <span v-if="attempted" class="error">E-Mail or password incorrect.</span>
-            </label>
-            <label>Password
-                <input type="password" v-model="password"/>
-                <span v-if="attempted" class="error">E-Mail or password incorrect.</span>
-            </label>
-            <div>
-                <button>Log in</button>
-            </div>
-        </form>
+    <div v-if="isAuthenticating" role="alert" aria-modal="true">
+        <div>
+            <h2 id="authenticating-title">Senior Common Room - Authenticating</h2>
+            <p>The authentication is in progress... Please wait...</p>
+        </div>
+    </div>
+    <div v-else role="dialog" aria-modal="true" aria-labelledby="login-title">
+        <div>
+            <h2 id="login-title">Senior Common Room - Login</h2>
+            <form @submit="login">
+                <label :class="{'error': attempted}">E-Mail
+                    <input type="email" v-model="email"/>
+                    <span v-if="attempted" class="error">E-Mail or password incorrect.</span>
+                </label>
+                <label :class="{'error': attempted}">Password
+                    <input type="password" v-model="password"/>
+                    <span v-if="attempted" class="error">E-Mail or password incorrect.</span>
+                </label>
+                <div>
+                    <button class="button primary">Log in</button>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+import { Options } from 'vue-class-component';
 
+import { ComponentRoot } from '../base';
 import { BUSY } from '../store/index';
 
 @Options({
 })
-export default class Login extends Vue {
+export default class Login extends ComponentRoot {
     public email = '';
     public password = '';
     public attempted = false;

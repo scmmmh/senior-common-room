@@ -5,11 +5,13 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+import { Options } from 'vue-class-component';
+
+import { ComponentRoot } from '../base';
 
 @Options({
 })
-export default class Lobby extends Vue {
+export default class Lobby extends ComponentRoot {
     public mounted() {
         this.$store.dispatch('enterRoom', 'lobby');
     }

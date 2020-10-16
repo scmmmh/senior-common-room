@@ -1,32 +1,12 @@
 /* Basic Settings */
 @import 'settings';
-@import 'foundation';
+@import 'functions';
 
-@include foundation-everything;
+@import 'layout';
+@import 'typography';
 
-.button-list {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-
-    a, button {
-        margin-left: $global-margin;
-
-        &:last-child {
-            margin-left: $global-margin * 3;
-        }
-
-        &:first-child {
-            margin-left: 0;
-        }
-    }
-}
-
-#jitsi {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-}
+@import 'dialog';
+@import 'alert';
+@import 'form';
+@import 'menu';
+@import 'button';

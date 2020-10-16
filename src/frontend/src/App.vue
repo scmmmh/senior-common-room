@@ -1,36 +1,38 @@
 <template>
-    <div v-if="!isConnected">
-        <h2>Connecting...</h2>
+    <div v-if="!isConnected" role="dialog" aria-modal="true">
+        <div>
+            <h2>Connecting...</h2>
+            <p>You are being connected to the Senior Common Room. Please wait...</p>
+        </div>
     </div>
-    <div v-else>
+    <main id="application" v-else>
         <nav>
             <ul role="menubar">
-                <li role="presentation">
-                    <a role="menuitem">Lobby</a>
-                </li>
+                <aria-menu-item @click="navigate('lobby')" :current="$route.name === 'lobby'" tabindex="0">Senior Common Room</aria-menu-item>
+                <aria-menu-item @click="navigate('about')" :current="$route.name === 'about'">About</aria-menu-item>
             </ul>
         </nav>
-        <div id="nav">
-            <router-link to="/">Home</router-link> |
-            <router-link to="/about">About</router-link>
-        </div>
         <login v-if="!isAuthenticated"/>
         <router-view v-else/>
-    </div>
+    </main>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+import { Options } from 'vue-class-component';
 
+import { ComponentRoot } from './base';
 import { READY } from './store/index';
 import Login from './components/Login.vue';
+import AriaMenuItem from './components/aria/AriaMenuItem.vue';
+
 
 @Options({
     components: {
-        Login
+        Login,
+        AriaMenuItem,
     }
 })
-export default class App extends Vue {
+export default class App extends ComponentRoot {
 
     public get isConnected() {
         return this.$store.state.connection.state === READY;
@@ -46,6 +48,10 @@ export default class App extends Vue {
 
     public unmounted() {
         this.$store.dispatch('close');
+    }
+
+    public navigate(routeName: string) {
+        this.$router.push({name: routeName});
     }
 }
 </script>

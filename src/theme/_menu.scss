@@ -1,0 +1,33 @@
+[role="menubar"] {
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    padding: 0;
+
+    [role="menuitem"] {
+        display: block;
+        padding: $global-padding/2 $global-padding;
+        cursor: pointer;
+    }
+}
+
+#application {
+    > nav {
+        [role="menubar"] {
+            background: $primary-colour;
+            box-shadow: 0 0 10px $medium-gray;
+
+            > li {
+                > [role="menuitem"] {
+                    color: $white;
+                    border-bottom: 2px solid transparent;
+
+                    &[aria-current] {
+                        border-bottom-color: $secondary-colour;
+                    }
+                }
+            }
+        }
+    }
+}
