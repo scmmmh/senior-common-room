@@ -29,12 +29,13 @@
 import { Options } from 'vue-class-component';
 
 import { ComponentRoot } from '../base';
+import { localLoadValue } from '../util/storage';
 import { BUSY } from '../store/index';
 
 @Options({
 })
 export default class Login extends ComponentRoot {
-    public email = '';
+    public email = localLoadValue('user.email', '');
     public password = '';
     public attempted = false;
 

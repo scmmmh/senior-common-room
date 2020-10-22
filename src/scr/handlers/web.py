@@ -14,7 +14,7 @@ from tornado.websocket import WebSocketHandler
 class ClientAPIHandler(WebSocketHandler):
     async def open(self):
         self.access_token = None
-        self.send_message({'type': 'notAuthenticated'})
+        self.send_message({'type': 'authenticate'})
         self.mqtt = asyncio_mqtt.Client(self.application.settings['config'].get('mqtt', 'host'),
                                         port=self.application.settings['config'].getint('mqtt', 'port'))
         self.tasks = {'rooms': {}}
@@ -83,9 +83,9 @@ class ClientAPIHandler(WebSocketHandler):
                             'accessToken': self.access_token,
                         })
                     else:
-                        self.send_message({'type': 'notAuthenticated'})
+                        self.send_message({'type': 'authenticationFailed'})
                 else:
-                    self.send_message({'type': 'notAuthenticated'})
+                    self.send_message({'type': 'authenticationFailed'})
         elif 'email' in data and 'accessToken' in data:
             async with self.application.settings['pool'].acquire() as conn:
                 result = await conn.fetchrow("SELECT * FROM scr_users WHERE email = $1 AND access_token = $2 AND access_token_timestamp + interval '24 hour'> now()",
@@ -109,6 +109,6 @@ class ClientAPIHandler(WebSocketHandler):
                         'accessToken': self.access_token,
                     })
                 else:
-                    self.send_message({'type': 'notAuthenticated'})
+                    self.send_message({'type': 'authenticationFailed'})
         else:
-            self.send_message({'type': 'notAuthenticated'})
+            self.send_message({'type': 'authenticationFailed'})

@@ -144,10 +144,12 @@ export default createStore({
         },
 
         async receiveMessage({ dispatch }, payload: WebSocketMessage) {
-            if (payload.type === 'notAuthenticated') {
+            if (payload.type === 'authenticate') {
                 dispatch('authenticate');
             } else if (payload.type === 'authenticated') {
                 dispatch('authenticated', payload);
+            } else if (payload.type === 'authenticationFailed') {
+                dispatch('authenticationFailed');
             } else {
                 console.log(payload);
             }
@@ -167,15 +169,13 @@ export default createStore({
             });
         },
 
-        async authenticate({ state, commit, dispatch }) {
+        async authenticate({ commit, dispatch }) {
             commit('setUserState', NOT_READY);
             const email = localLoadValue('user.email', null);
             const accessToken = localLoadValue('user.accessToken', null);
             if (email && accessToken) {
                 commit('setUserState', BUSY);
                 commit('setUser', null);
-                localDeleteValue('user.email');
-                localDeleteValue('user.accessToken');
                 dispatch('sendMessage', {
                     type: 'authenticate',
                     email: email,
@@ -191,6 +191,12 @@ export default createStore({
                 email: payload.email,
                 password: payload.password,
             });
+        },
+
+        async authenticationFailed({ commit}) {
+            localDeleteValue('user.accessToken');
+            commit('setUserState', NOT_READY);
+            commit('setUser', null);
         },
 
         async authenticated({ commit }, payload: WebSocketMessage) {
