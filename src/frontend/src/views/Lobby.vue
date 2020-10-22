@@ -1,6 +1,6 @@
 <template>
     <div class="lobby">
-        Lobby
+        <room :questions="false"/>
     </div>
 </template>
 
@@ -8,8 +8,12 @@
 import { Options } from 'vue-class-component';
 
 import { ComponentRoot } from '../base';
+import Room from '../components/Room.vue';
 
 @Options({
+    components: {
+        Room,
+    },
 })
 export default class Lobby extends ComponentRoot {
     public mounted() {

@@ -1,0 +1,21 @@
+[role="tablist"] {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+
+    > li {
+        flex: 1 1 auto;
+
+        [role="tab"] {
+            display: block;
+            border-bottom: 2px solid $primary-colour;
+            text-align: center;
+            cursor: pointer;
+
+            &[aria-selected="true"] {
+                border-bottom-color: $secondary-colour;
+            }
+        }
+    }
+}
