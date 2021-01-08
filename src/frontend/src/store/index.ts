@@ -136,7 +136,7 @@ export default createStore({
             }, 10000));
         },
 
-        async sendMessage({ state, dispatch}, payload: any) {
+        async sendMessage({ state, dispatch }, payload: any) {
             await dispatch('connect');
             if (state.connection.websocket) {
                 state.connection.websocket.send(JSON.stringify(payload));

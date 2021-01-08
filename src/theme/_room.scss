@@ -1,24 +1,14 @@
-.room {
-    display: flex;
-    flex-direction: row;
+#room {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: minmax(rem-calc(200px), 20rem) 1fr;
     height: 100%;
-    overflow: hidden;
 
-    .sidebar {
-        display: flex;
-        flex-direction: column;
-        width: 20rem;
-        border-right: 1px solid $medium-gray;
-        padding-top: $global-padding;
-        overflow: hidden;
-
-        > nav {
-            flex: 0 0 auto;
-        }
-
-        > div {
-            flex: 1 1 auto;
-            overflow: auto;
+    .chat {
+        ol {
+            li {
+                list-style-type: none;
+            }
         }
     }
 }
