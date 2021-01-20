@@ -2,9 +2,7 @@ import asyncio
 import asyncio_mqtt
 import asyncpg
 import json
-import tornado.ioloop
 
-from contextlib import AsyncExitStack
 from hashlib import sha3_256
 from secrets import token_hex
 
@@ -28,8 +26,8 @@ class ClientAPIHandler(WebSocketHandler):
             self.tasks['rooms'][data['room']] = asyncio.create_task(self.enter_room(data['room']))
         elif data['type'] == 'leaveRoom':
             await self.leave_room(data['room'])
-        else:
-            print(message)
+        # else:
+        #     print(message)
 
     def on_close(self):
         for task in self.tasks['rooms'].values():
@@ -40,6 +38,7 @@ class ClientAPIHandler(WebSocketHandler):
         self.write_message(json.dumps(data))
 
     async def enter_room(self, room_name):
+        """Enter the given room."""
         async with self.mqtt.filtered_messages(f'rooms/{room_name}') as messages:
             await self.mqtt.subscribe(f'rooms/{room_name}')
             async for msg in messages:
@@ -70,9 +69,9 @@ class ClientAPIHandler(WebSocketHandler):
                         while not created:
                             try:
                                 self.access_token = token_hex(64)
-                                await conn.execute('UPDATE scr_users SET access_token = $1, access_token_timestamp = now() WHERE id = $2',
-                                                self.access_token,
-                                                result.get('id'))
+                                await conn.execute('UPDATE scr_users SET access_token = $1, access_token_timestamp = now() WHERE id = $2',  # noqa: E501
+                                                   self.access_token,
+                                                   result.get('id'))
                                 created = True
                             except asyncpg.PostgresError:
                                 pass
@@ -88,7 +87,7 @@ class ClientAPIHandler(WebSocketHandler):
                     self.send_message({'type': 'authenticationFailed'})
         elif 'email' in data and 'accessToken' in data:
             async with self.application.settings['pool'].acquire() as conn:
-                result = await conn.fetchrow("SELECT * FROM scr_users WHERE email = $1 AND access_token = $2 AND access_token_timestamp + interval '24 hour'> now()",
+                result = await conn.fetchrow("SELECT * FROM scr_users WHERE email = $1 AND access_token = $2 AND access_token_timestamp + interval '24 hour'> now()",  # noqa: E501
                                              data['email'],
                                              data['accessToken'])
                 if result:
@@ -96,9 +95,9 @@ class ClientAPIHandler(WebSocketHandler):
                     while not created:
                         try:
                             self.access_token = token_hex(64)
-                            await conn.execute('UPDATE scr_users SET access_token = $1, access_token_timestamp = now() WHERE id = $2',
-                                            self.access_token,
-                                            result.get('id'))
+                            await conn.execute('UPDATE scr_users SET access_token = $1, access_token_timestamp = now() WHERE id = $2',  # noqa: E501
+                                               self.access_token,
+                                               result.get('id'))
                             created = True
                         except asyncpg.PostgresError:
                             pass
