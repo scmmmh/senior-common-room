@@ -8,8 +8,10 @@ from secrets import token_hex
 
 from tornado.websocket import WebSocketHandler
 
+from .mixins import RoomMixin
 
-class ClientAPIHandler(WebSocketHandler):
+
+class ClientAPIHandler(WebSocketHandler, RoomMixin):
     async def open(self):
         self.access_token = None
         self.send_message({'type': 'authenticate'})
@@ -24,6 +26,7 @@ class ClientAPIHandler(WebSocketHandler):
             await self.authenticate(data)
         elif data['type'] == 'enterRoom':
             self.tasks['rooms'][data['room']] = asyncio.create_task(self.enter_room(data['room']))
+            await self.list_room_participants(data['room'])
         elif data['type'] == 'leaveRoom':
             await self.leave_room(data['room'])
         # else:
@@ -36,19 +39,6 @@ class ClientAPIHandler(WebSocketHandler):
 
     def send_message(self, data):
         self.write_message(json.dumps(data))
-
-    async def enter_room(self, room_name):
-        """Enter the given room."""
-        async with self.mqtt.filtered_messages(f'rooms/{room_name}') as messages:
-            await self.mqtt.subscribe(f'rooms/{room_name}')
-            async for msg in messages:
-                self.send_message({'type': 'test', 'data': msg.payload.decode()})
-
-    async def leave_room(self, room_name):
-        if room_name in self.tasks['rooms']:
-            await self.mqtt.unsubscribe(f'rooms/{room_name}')
-            self.tasks['rooms'][room_name].cancel()
-            del self.tasks['rooms'][room_name]
 
     async def authenticate(self, data):
         """Authenticate the user.
