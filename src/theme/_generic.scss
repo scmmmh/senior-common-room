@@ -6,3 +6,17 @@
     height: 1px;
     overflow: hidden;
 }
+
+.show-for-small {
+    @media screen and (min-width: 1024px) and (min-width: 768px) {
+        display: none;
+    }
+}
+
+.hide-for-small {
+    display: none;
+
+    @media screen and (min-width: 1024px) and (min-width: 768px) {
+        display: block;
+    }
+}

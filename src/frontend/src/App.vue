@@ -1,11 +1,17 @@
 <template>
-    <div v-if="!isConnected" role="dialog" aria-modal="true">
+    <div role="alert" aria-modal="true" class="show-for-small">
+        <div>
+            <h2>Display unsupported</h2>
+            <p>Unfortunately the Senior Common Room currently requires a screen at least 1024x768 pixel in size.</p>
+        </div>
+    </div>
+    <div v-if="!isConnected" role="dialog" aria-modal="true" class="hide-for-small">
         <div>
             <h2>Connecting...</h2>
             <p>You are being connected to the Senior Common Room. Please wait...</p>
         </div>
     </div>
-    <main id="application" v-else>
+    <main id="application" v-else class="hide-for-small">
         <nav>
             <ul role="menubar">
                 <aria-menu-item v-for="room in publicRooms" :key="room.id" @click="navigate({'name': 'room', 'params': {'rid': room.id}})" :current="$route.name === 'room' && $route.params.rid === room.id" tabindex="0">Senior Common Room</aria-menu-item>

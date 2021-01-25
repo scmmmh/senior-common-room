@@ -11,7 +11,8 @@
     "gulp-autoprefixer": "^7.0.1",
     "gulp-concat": "^2.6.1",
     "gulp-sass": "^4.0.2",
-    "pump": "^3.0.0"
+    "pump": "^3.0.0",
+    "testcafe": "^1.10.1"
   },
   "repository": "https://github.com/scmmmh/senior-common-room.git",
   "author": "Mark <mark.hall@work.room3b.eu>"

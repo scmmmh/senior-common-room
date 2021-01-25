@@ -28,11 +28,14 @@ async def make_app(config):
             'pool': pool,
             'config': config,
         }
-
-        app = tornado.web.Application([
+        handlers = [
             (r'/', RedirectHandler, {'url': '/static/', 'permanent': False}),
-            ('/websocket', ClientAPIHandler),
-        ], **settings)
+            (r'/websocket', ClientAPIHandler),
+        ]
+        if config.getboolean('server', 'tests'):
+            from ..handlers.test import TestHandler
+            handlers.append((r'/tests', TestHandler))
+        app = tornado.web.Application(handlers, **settings)
         app.listen(port=config.getint('server', 'port'), address=config.get('server', 'host'))
         logger.debug('Server listening')
     else:
