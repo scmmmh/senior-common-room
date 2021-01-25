@@ -2,17 +2,9 @@
     <div class="chat">
         <h2 class="show-for-sr">Chat messages</h2>
         <ol>
-            <li>
-                <h3>Somebody</h3>
-                <p>Just some text</p>
-            </li>
-            <li>
-                <h3>Somebody Else</h3>
-                <p>Just some text</p>
-            </li>
-            <li>
-                <h3>Another</h3>
-                <p>Just some text</p>
+            <li v-for="(message, idx) in messages" :key="idx">
+                <h3>{{ message.user.id === $store.state.user.id ? 'You' : message.user.name }}</h3>
+                <p>{{ message.message }}</p>
             </li>
         </ol>
     </div>
@@ -20,25 +12,10 @@
         <h2 class="show-for-sr">People in the room</h2>
         <ol>
             <li>
-                <h3>Some Administrator</h3>
+                <h3>{{ $store.state.user.name }}</h3>
             </li>
-            <li>
-                <h3>Some Presenter</h3>
-            </li>
-            <li>
-                <h3>Another Presenter</h3>
-            </li>
-            <li>
-                <h3>A Participant</h3>
-            </li>
-            <li>
-                <h3>Another Participant</h3>
-            </li>
-            <li>
-                <h3>The Participant</h3>
-            </li>
-            <li>
-                <h3>Some Participant</h3>
+            <li v-for="user in users" :key="user.id">
+                <h3>{{ user.name }}</h3>
             </li>
         </ol>
     </div>
@@ -52,5 +29,22 @@ import { ComponentRoot } from '../base';
 @Options({
 })
 export default class CasualRoomLayout extends ComponentRoot {
+    public get users() {
+        const users = Object.values(this.$store.state.users);
+        users.sort((a, b) => {
+            if (a.name < b.name) {
+                return -1;
+            } else if (a.name > b.name) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        return users;
+    }
+
+    public get messages() {
+        return this.$store.state.messages;
+    }
 }
 </script>

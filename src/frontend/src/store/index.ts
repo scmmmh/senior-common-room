@@ -9,6 +9,10 @@ export const READY = 2;
 interface State {
     connection: ConnectionState;
     user: UserState;
+    publicRooms: string[];
+    rooms: RoomListState;
+    users: RoomUsersState;
+    messages: MessageState[];
 }
 
 interface ConnectionState {
@@ -19,6 +23,7 @@ interface ConnectionState {
 
 interface UserState {
     state: 0 | 1 | 2;
+    id: string;
     email: string;
     name: string;
     accessToken: string;
@@ -35,9 +40,34 @@ export interface LoginDetails {
 }
 
 interface AuthenticatedMessage {
+    id: string;
     email: string;
     name: string;
     accessToken: string;
+}
+
+interface RoomListState {
+    [x: string]: RoomState;
+}
+
+export interface RoomState {
+    id: string;
+    label: string;
+    lobby: boolean;
+}
+
+interface RoomUsersState {
+    [x: string]: RoomUserState;
+}
+
+export interface RoomUserState {
+    id: string;
+    name: string;
+}
+
+export interface MessageState {
+    user: RoomUserState;
+    message: string;
 }
 
 export default createStore({
@@ -49,10 +79,15 @@ export default createStore({
         },
         user: {
             state: 0,
+            id: '',
             email: '',
             name: '',
             accessToken: '',
-        }
+        },
+        publicRooms: [],
+        rooms: {},
+        users: {},
+        messages: [],
     } as State,
 
     mutations: {
@@ -74,6 +109,7 @@ export default createStore({
 
         setUser(state, payload: AuthenticatedMessage | null) {
             if (payload) {
+                state.user.id = payload.id;
                 state.user.email = payload.email;
                 state.user.name = payload.name;
                 state.user.accessToken = payload.accessToken;
@@ -84,7 +120,43 @@ export default createStore({
                 state.user.name = '';
                 state.user.accessToken = '';
             }
-        }
+        },
+
+        setPublicRooms(state, payload: WebSocketMessage) {
+            state.publicRooms = [];
+            payload.rooms.forEach((room: RoomState) => {
+                state.rooms[room.id] = room;
+                state.publicRooms.push(room.id);
+            })
+        },
+
+        setRoomUsers(state, payload: WebSocketMessage) {
+            const users = {} as RoomUsersState;
+            payload.users.forEach((user: RoomUserState) => {
+                users[user.id] = user;
+            });
+            state.users = users;
+        },
+
+        addRoomUser(state, payload: WebSocketMessage) {
+            if (payload.data.id !== state.user.id) {
+                state.users[payload.data.id] = payload.data;
+            }
+        },
+
+        removeRoomUser(state, payload: WebSocketMessage) {
+            if (state.users[payload.data.id]) {
+                delete state.users[payload.data.id];
+            }
+        },
+
+        clearMessages(state) {
+            state.messages = [];
+        },
+
+        addMessage(state, payload: MessageState) {
+            state.messages.push(payload);
+        },
     },
 
     actions: {
@@ -100,7 +172,7 @@ export default createStore({
                     websocket.addEventListener('open', () => {
                         commit('setConnectionState', READY);
                         commit('setWebSocket', websocket);
-                        resolve();
+                        resolve(true);
                     });
                     websocket.addEventListener('message', (ev) => {
                         dispatch('receiveMessage', JSON.parse(ev.data));
@@ -118,7 +190,7 @@ export default createStore({
                 } else if (state.connection.state === 1) {
                     commit('setConnectionState', BUSY);
                 } else if (state.connection.state === 2) {
-                    resolve();
+                    resolve(true);
                 }
             });
         },
@@ -143,13 +215,29 @@ export default createStore({
             }
         },
 
-        async receiveMessage({ dispatch }, payload: WebSocketMessage) {
+        async receiveMessage({ dispatch, commit }, payload: WebSocketMessage) {
             if (payload.type === 'authenticate') {
                 dispatch('authenticate');
             } else if (payload.type === 'authenticated') {
                 dispatch('authenticated', payload);
             } else if (payload.type === 'authenticationFailed') {
                 dispatch('authenticationFailed');
+            } else if (payload.type === 'publicRoomsList') {
+                commit('setPublicRooms', payload);
+            } else if (payload.type === 'roomUsersList') {
+                commit('setRoomUsers', payload);
+            } else if (payload.type === 'userEntersRoom') {
+                commit('addRoomUser', payload);
+                commit('addMessage', {
+                    user: payload.data,
+                    message: 'Has entered the room',
+                });
+            } else if (payload.type === 'userLeavesRoom') {
+                commit('removeRoomUser', payload);
+                commit('addMessage', {
+                    user: payload.data,
+                    message: 'Has left the room',
+                });
             } else {
                 console.log(payload);
             }
@@ -199,13 +287,15 @@ export default createStore({
             commit('setUser', null);
         },
 
-        async authenticated({ commit }, payload: WebSocketMessage) {
+        async authenticated({ commit, dispatch }, payload: WebSocketMessage) {
             commit('setUser', {
+                id: payload.id,
                 email: payload.email,
                 name: payload.name,
                 accessToken: payload.accessToken,
             });
             commit('setUserState', READY);
+            await dispatch('sendMessage', {type: 'getPublicRooms'});
         },
     },
     modules: {

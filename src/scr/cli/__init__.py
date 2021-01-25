@@ -16,6 +16,7 @@ DEFAULT_CONFIG = {
         'host': '127.0.0.1',
         'port': 6543,
         'debug': False,
+        'autoreload': False,
     },
     'mqtt': {
         'host': '127.0.0.1',

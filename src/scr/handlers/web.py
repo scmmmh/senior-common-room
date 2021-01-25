@@ -12,6 +12,9 @@ from .mixins import RoomMixin
 
 
 class ClientAPIHandler(WebSocketHandler, RoomMixin):
+    user_id = None
+    user_name = ''
+
     async def open(self):
         self.access_token = None
         self.send_message({'type': 'authenticate'})
@@ -24,9 +27,10 @@ class ClientAPIHandler(WebSocketHandler, RoomMixin):
         data = json.loads(message)
         if data['type'] == 'authenticate':
             await self.authenticate(data)
+        elif data['type'] == 'getPublicRooms':
+            await self.get_public_rooms()
         elif data['type'] == 'enterRoom':
             self.tasks['rooms'][data['room']] = asyncio.create_task(self.enter_room(data['room']))
-            await self.list_room_participants(data['room'])
         elif data['type'] == 'leaveRoom':
             await self.leave_room(data['room'])
         # else:
@@ -55,6 +59,8 @@ class ClientAPIHandler(WebSocketHandler, RoomMixin):
                     hash.update(b'$$')
                     hash.update(data['password'].encode())
                     if hash.hexdigest() == result.get('password'):
+                        self.user_id = result.get('id')
+                        self.user_name = result.get('name')
                         created = False
                         while not created:
                             try:
@@ -65,8 +71,10 @@ class ClientAPIHandler(WebSocketHandler, RoomMixin):
                                 created = True
                             except asyncpg.PostgresError:
                                 pass
+                        await conn.execute('DELETE FROM scr_users_rooms WHERE user_id = $1', result.get('id'))
                         self.send_message({
                             'type': 'authenticated',
+                            'id': str(result.get('id')),
                             'email': result.get('email'),
                             'name': result.get('name'),
                             'accessToken': self.access_token,
@@ -81,6 +89,8 @@ class ClientAPIHandler(WebSocketHandler, RoomMixin):
                                              data['email'],
                                              data['accessToken'])
                 if result:
+                    self.user_id = result.get('id')
+                    self.user_name = result.get('name')
                     created = False
                     while not created:
                         try:
@@ -91,8 +101,10 @@ class ClientAPIHandler(WebSocketHandler, RoomMixin):
                             created = True
                         except asyncpg.PostgresError:
                             pass
+                    await conn.execute('DELETE FROM scr_users_rooms WHERE user_id = $1', result.get('id'))
                     self.send_message({
                         'type': 'authenticated',
+                        'id': str(result.get('id')),
                         'email': result.get('email'),
                         'name': result.get('name'),
                         'accessToken': self.access_token,

@@ -19,6 +19,7 @@ async def make_app(config):
     if await verify_db(pool):
         settings = {
             'debug': config.getboolean('server', 'debug'),
+            'autorealod': config.getboolean('server', 'autoreload'),
             'static_path': os.path.join(os.path.dirname(importlib.machinery.PathFinder().
                                                         find_module('scr').get_filename()),
                                         'static'),

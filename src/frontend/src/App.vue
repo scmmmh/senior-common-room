@@ -8,8 +8,8 @@
     <main id="application" v-else>
         <nav>
             <ul role="menubar">
-                <aria-menu-item @click="navigate('lobby')" :current="$route.name === 'lobby'" tabindex="0">Senior Common Room</aria-menu-item>
-                <aria-menu-item @click="navigate('about')" :current="$route.name === 'about'">About</aria-menu-item>
+                <aria-menu-item v-for="room in publicRooms" :key="room.id" @click="navigate({'name': 'room', 'params': {'rid': room.id}})" :current="$route.name === 'room' && $route.params.rid === room.id" tabindex="0">Senior Common Room</aria-menu-item>
+                <aria-menu-item @click="navigate({name: 'about'})" :current="$route.name === 'about'">About</aria-menu-item>
             </ul>
         </nav>
         <login v-if="!isAuthenticated"/>
@@ -42,6 +42,19 @@ export default class App extends ComponentRoot {
         return this.$store.state.user.state === READY;
     }
 
+    public get publicRooms() {
+        return this.$store.state.publicRooms.map((roomId) => {
+            const room = this.$store.state.rooms[roomId];
+            if (room) {
+                return room;
+            } else {
+                return null;
+            }
+        }).filter((room) => {
+            return room != null;
+        });
+    }
+
     public mounted() {
         this.$store.dispatch('init');
     }
@@ -50,8 +63,8 @@ export default class App extends ComponentRoot {
         this.$store.dispatch('close');
     }
 
-    public navigate(routeName: string) {
-        this.$router.push({name: routeName});
+    public navigate(route: {name: string; params: {rid: string}}) {
+        this.$router.push(route);
     }
 }
 </script>
