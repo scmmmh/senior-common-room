@@ -167,7 +167,6 @@ export default createStore({
         connect({ state, commit, dispatch }) {
             return new Promise((resolve, reject) => {
                 if (state.connection.state === 0) {
-                    commit('setConnectionState', BUSY);
                     const websocket = new WebSocket('ws://localhost:6543/websocket');
                     websocket.addEventListener('open', () => {
                         commit('setConnectionState', READY);

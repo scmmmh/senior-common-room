@@ -43,7 +43,8 @@ export default class Login extends ComponentRoot {
         return this.$store.state.user.state === BUSY;
     }
 
-    public login() {
+    public login(ev: Event) {
+        ev.preventDefault();
         this.$store.dispatch('authenticateEmailPassword', {
             email: this.email,
             password: this.password,
