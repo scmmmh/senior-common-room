@@ -245,14 +245,18 @@ export default createStore({
         async enterRoom({ dispatch }, payload: string) {
             await dispatch('sendMessage', {
                 type: 'enterRoom',
-                room: payload,
+                data: {
+                    room: payload,
+                },
             });
         },
 
         async leaveRoom({ dispatch }, payload: string) {
             await dispatch('sendMessage', {
                 type: 'leaveRoom',
-                room: payload,
+                data: {
+                    room: payload,
+                },
             });
         },
 
@@ -265,8 +269,10 @@ export default createStore({
                 commit('setUser', null);
                 dispatch('sendMessage', {
                     type: 'authenticate',
-                    email: email,
-                    accessToken: accessToken,
+                    data: {
+                        email: email,
+                        accessToken: accessToken,
+                    },
                 });
             }
         },
@@ -275,8 +281,10 @@ export default createStore({
             commit('setUserState', BUSY);
             dispatch('sendMessage', {
                 type: 'authenticate',
-                email: payload.email,
-                password: payload.password,
+                data: {
+                    email: payload.email,
+                    password: payload.password,
+                },
             });
         },
 
@@ -288,10 +296,10 @@ export default createStore({
 
         async authenticated({ commit, dispatch }, payload: WebSocketMessage) {
             commit('setUser', {
-                id: payload.id,
-                email: payload.email,
-                name: payload.name,
-                accessToken: payload.accessToken,
+                id: payload.data.id,
+                email: payload.data.email,
+                name: payload.data.name,
+                accessToken: payload.data.accessToken,
             });
             commit('setUserState', READY);
             await dispatch('sendMessage', {type: 'getPublicRooms'});
