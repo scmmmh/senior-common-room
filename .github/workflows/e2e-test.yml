@@ -50,6 +50,10 @@ jobs:
         yarn install
         poetry install
 
+    - name: Build Frontend
+      run: |
+        gulp
+
     - name: Run Tests
       run: |
         poetry run python -m scr -c test.ini db update
