@@ -1,0 +1,64 @@
+name: End-to-End Tests
+
+on:
+  push:
+    branches: [ default ]
+  pull_request:
+    branches: [ default ]
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-20.04
+    strategy:
+      max-parallel: 2
+      matrix:
+        python-version: ['3.7', '3.8']
+        node-version: ['12']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Environment
+      run: |
+        echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+        echo "PIPX_BIN_DIR=$HOME/.local/bin" >> $GITHUB_ENV
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Setup Environment
+      run: |
+        echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+        echo "PIPX_HOME=$HOME/.local/pipx" >> $GITHUB_ENV
+        echo "PIPX_BIN_DIR=$HOME/.local/bin" >> $GITHUB_ENV
+
+    - name: Install Base Dependencies
+      run: |
+        sudo apt-get install python3-venv pipx mosquitto postgresql-12
+        sudo systemctl start postgresql
+        sudo -u postgres /bin/bash -c "psql -c \"CREATE USER dev WITH PASSWORD 'devPWD';\""
+        sudo -u postgres createdb -O dev senior-common-room-test
+        pipx install poetry
+
+    - name: Install Dependencies
+      run: |
+        yarn install
+        cd src/frontend
+        yarn install
+        cd ../../
+        poetry install
+
+    - name: Build Frontend
+      run: |
+        gulp
+
+    - name: Run Tests
+      run: |
+        poetry run python -m scr -c test.ini db update
+        poetry run python -m scr -c test.ini server run &
+        node_modules/.bin/testcafe firefox:headless tests
