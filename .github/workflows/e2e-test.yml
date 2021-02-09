@@ -39,7 +39,7 @@ jobs:
 
     - name: Install Base Dependencies
       run: |
-        sudo apt-get install python3-venv pipx mosquitto postgresql-server
+        sudo apt-get install python3-venv pipx mosquitto postgresql-12
         echo devPWD | sudo -u postgres createuser -P dev
         sudo -u postgres -o dev senior-common-room-test
         pipx install poetry
