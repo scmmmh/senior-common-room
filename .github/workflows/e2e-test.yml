@@ -52,5 +52,6 @@ jobs:
 
     - name: Run Tests
       run: |
+        poetry run python -m scr -c test.ini db update
         poetry run python -m scr -c test.ini server run &
         node_modules/.bin/testcafe firefox:headless tests
