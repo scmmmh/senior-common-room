@@ -48,7 +48,7 @@ gulp.task('theme:styles', function(cb) {
 
 gulp.task('theme', gulp.parallel('theme:static', 'theme:styles'));
 
-gulp.task('default', gulp.parallel('theme', 'frontend'));
+gulp.task('default', gulp.series('frontend', 'theme'));
 
 gulp.task('watch', gulp.parallel('theme', 'frontend:watch', function(cb) {
     gulp.watch('src/theme/**/*.scss', gulp.series('theme:styles'));
