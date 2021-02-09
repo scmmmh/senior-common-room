@@ -25,7 +25,7 @@ class TestHandler(RequestHandler):
             salt = token_hex(32)
             hash = sha3_256()
             hash.update(salt.encode())
-            hash.update(b'$$testing')
+            hash.update(b'$$test')
             password = hash.hexdigest()
             await conn.execute('INSERT INTO scr_users(email, salt, password, name, created_at) VALUES($1, $2, $3, $4, now())',  # NOQA: E501
                                'test1@example.com',

@@ -12,10 +12,13 @@
         </div>
     </div>
     <main id="application" v-else class="hide-for-small">
-        <nav>
+        <nav v-if="isAuthenticated" class="flex">
             <ul role="menubar">
                 <aria-menu-item v-for="room in publicRooms" :key="room.id" @click="navigate({'name': 'room', 'params': {'rid': room.id}})" :current="$route.name === 'room' && $route.params.rid === room.id" tabindex="0">Senior Common Room</aria-menu-item>
                 <aria-menu-item @click="navigate({name: 'about'})" :current="$route.name === 'about'">About</aria-menu-item>
+            </ul>
+            <ul role="menubar" class="shrink">
+                <aria-menu-item @click="logout()">Log out</aria-menu-item>
             </ul>
         </nav>
         <login v-if="!isAuthenticated"/>
@@ -71,6 +74,10 @@ export default class App extends ComponentRoot {
 
     public navigate(route: {name: string; params: {rid: string}}) {
         this.$router.push(route);
+    }
+
+    public logout() {
+        this.$store.dispatch('logout');
     }
 }
 </script>

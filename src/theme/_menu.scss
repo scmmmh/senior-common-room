@@ -22,6 +22,7 @@
                 > [role="menuitem"] {
                     color: $white;
                     border-bottom: 2px solid transparent;
+                    white-space: nowrap;
 
                     &[aria-current] {
                         border-bottom-color: $secondary-colour;

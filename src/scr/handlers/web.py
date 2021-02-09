@@ -23,6 +23,8 @@ class ClientAPIHandler(WebSocketHandler, UserMixin, RoomMixin):
         data = json.loads(message)
         if data['type'] == 'authenticate':
             await self.authenticate(data['data'])
+        elif data['type'] == 'logout':
+            await self.logout()
         elif data['type'] == 'getPublicRooms':
             await self.get_public_rooms()
         elif data['type'] == 'enterRoom':

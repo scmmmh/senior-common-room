@@ -304,6 +304,14 @@ export default createStore({
             commit('setUserState', READY);
             await dispatch('sendMessage', {type: 'getPublicRooms'});
         },
+
+        async logout({ commit, dispatch }) {
+            dispatch('sendMessage', {
+                type: 'logout',
+            });
+            commit('setUser', null);
+            commit('setUserState', 0);
+        }
     },
     modules: {
     }

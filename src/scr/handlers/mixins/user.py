@@ -78,3 +78,9 @@ class UserMixin():
                     self.send_message({'type': 'authenticationFailed'})
         else:
             self.send_message({'type': 'authenticationFailed'})
+
+    async def logout(self):
+        """Log the user out.
+        """
+        self.user_id = None
+        self.user_name = None
