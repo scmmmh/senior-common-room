@@ -42,7 +42,7 @@ jobs:
         sudo apt-get install python3-venv pipx mosquitto postgresql-12
         sudo systemctl start postgresql
         sudo -u postgres psql <<SCRIPT
-          CREATE USER 'dev' PASSWORD 'devPWD';
+          CREATE USER dev WITH PASSWORD 'devPWD';
         SCRIPT
         sudo -u postgres -o dev senior-common-room-test
         pipx install poetry
