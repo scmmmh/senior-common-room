@@ -166,7 +166,8 @@ export default createStore({
 
         connect({ state, commit, dispatch }) {
             return new Promise((resolve, reject) => {
-                if (state.connection.state === 0) {
+                console.log(state.connection.state);
+                if (state.connection.state === NOT_READY) {
                     const websocket = new WebSocket('ws://localhost:6543/websocket');
                     websocket.addEventListener('open', () => {
                         commit('setConnectionState', READY);
@@ -179,6 +180,7 @@ export default createStore({
                     websocket.addEventListener('close', () => {
                         commit('setConnectionState', NOT_READY);
                         dispatch('disconnect');
+                        dispatch('reconnect');
                     });
                     websocket.addEventListener('error', () => {
                         commit('setConnectionState', NOT_READY);
@@ -186,25 +188,24 @@ export default createStore({
                         dispatch('reconnect');
                         reject();
                     });
-                } else if (state.connection.state === 1) {
+                } else if (state.connection.state === BUSY) {
                     commit('setConnectionState', BUSY);
-                } else if (state.connection.state === 2) {
+                } else if (state.connection.state === READY) {
                     resolve(true);
                 }
             });
         },
 
         async disconnect({ commit }) {
-            commit('setConnectionState', 0);
+            commit('setConnectionState', NOT_READY);
             commit('setWebSocket', null);
         },
 
         async reconnect({ state, commit, dispatch }) {
             clearTimeout(state.connection.reconnectTimeout);
-            commit('setConnectionState', BUSY);
             commit('setReconnectTimeout', setTimeout(() => {
                 dispatch('connect');
-            }, 10000));
+            }, 5000));
         },
 
         async sendMessage({ state, dispatch }, payload: any) {
@@ -311,7 +312,8 @@ export default createStore({
             });
             commit('setUser', null);
             commit('setUserState', 0);
-        }
+            localDeleteValue('user.accessToken');
+        },
     },
     modules: {
     }

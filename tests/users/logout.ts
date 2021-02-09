@@ -18,6 +18,8 @@ test('Successful logout', async (test) => {
         .expect(Selector('h2').withText('Senior Common Room - Login').filterVisible().exists).notOk()
         .expect(Selector('h2').withText('Senior Common Room - Authenticating').filterVisible().exists).notOk()
         .click(Selector('a').withText('Log out'))
+        .expect(Selector('h2').filterVisible().innerText).eql('Connecting...')
+        .wait(5000)
         .expect(Selector('h1').filterVisible().innerText).eql('Senior Common Room')
         .expect(Selector('h2').filterVisible().innerText).eql('Senior Common Room - Login');
 });

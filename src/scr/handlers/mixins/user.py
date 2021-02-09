@@ -82,5 +82,4 @@ class UserMixin():
     async def logout(self):
         """Log the user out.
         """
-        self.user_id = None
-        self.user_name = None
+        self.close()
