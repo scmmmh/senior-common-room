@@ -2,7 +2,7 @@ name: End-to-End Tests
 
 on:
   push:
-    branches: [ default ]
+    branches: [ test-workflow ]
   pull_request:
     branches: [ default ]
 
