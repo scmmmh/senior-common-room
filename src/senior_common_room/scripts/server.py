@@ -14,10 +14,10 @@ from ..handlers import ApiHandler
 logger = logging.getLogger(__name__)
 
 
-async def jitsi_room_state_server():
+async def jitsi_room_state_server(config):
     jitsi_rooms = {}
     logger.debug('Jitsi room state server starting up')
-    async with asyncio_mqtt.Client("127.0.0.1") as client:
+    async with asyncio_mqtt.Client(config['mosquitto']) as client:
         logger.debug('Jitsi room state server started')
 
         async def enter_handler():
@@ -69,5 +69,5 @@ def server(ctx):
     ], debug=True)
     app.listen(6543, '0.0.0.0')
     if 'jitsi' in ctx.obj['config']:
-        IOLoop.current().add_callback(jitsi_room_state_server)
+        IOLoop.current().add_callback(jitsi_room_state_server, ctx.obj['config'])
     IOLoop.current().start()
