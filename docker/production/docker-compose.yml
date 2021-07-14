@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  frontend:
+    build:
+      context: ../../
+      dockerfile: docker/production/static/Dockerfile
+    image: scmmmh/seniorcommonroom:static
+    ports:
+      - "0.0.0.0:8000:80"
+    volumes:
+      - ./assets:/usr/share/nginx/html/assets
+  api:
+    build:
+      context: ../../
+      dockerfile: docker/production/api/Dockerfile
+    image: scmmmh/seniorcommonroom:api
+    volumes:
+      - ./config.yml:/etc/senior-common-room/config.yml
+      - ./assets:/var/lib/senior-common-room
+  database:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=devPWD
+    volumes:
+      - postgres:/var/lib/postgresql/data
+  mosquitto:
+    build:
+      context: ../../
+      dockerfile: docker/production/mosquitto/Dockerfile
+    image: scmmmh/seniorcommonroom:mosquitto
+volumes:
+  postgres:
