@@ -20,9 +20,10 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
   mosquitto:
-    build: mosquitto
-    image: scmmmh/senior_common_room_mosquitto
+    image: eclipse-mosquitto:latest
     ports:
       - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 volumes:
   postgres:
