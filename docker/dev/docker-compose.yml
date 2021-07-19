@@ -8,7 +8,7 @@ services:
     restart: always
     volumes:
       - ../../src/frontend/public:/usr/share/nginx/html/frontend
-      - ../../assets:/usr/share/nginx/html/assets
+      - ./assets:/usr/share/nginx/html/assets
     extra_hosts:
       - "host.docker.internal:host-gateway"
   database:
