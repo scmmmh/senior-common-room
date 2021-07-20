@@ -88,7 +88,6 @@ This e-mail is automatically generated. Please do not reply to it.
         })
 
     async def get_user(self, message):
-        # TODO: Extend the check if the user model has a token string set and the file exists - otherwise send onboarding message, store the avatar image when it is uploaded, generating a random token string and store the image under that token string
         if self.user is None or self.user.avatar is None \
                 or not os.path.exists(os.path.join(self.config['storage']['avatars'],
                                                    f'{self.user.avatar}-large.png')) \
@@ -101,6 +100,7 @@ This e-mail is automatically generated. Please do not reply to it.
             await self.send_message({
                 'type': 'user',
                 'payload': {
+                    'id': self.user.id,
                     'name': self.user.name,
                     'email': self.user.email,
                     'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}',

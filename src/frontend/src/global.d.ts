@@ -24,6 +24,7 @@ interface TilesetPayload {
 }
 
 interface UserPayload {
+    id: number;
     name: string;
     email: string;
     avatar: string;
