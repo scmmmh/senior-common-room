@@ -95,9 +95,6 @@
 
             public map: Phaser.Tilemaps.Tilemap;
             private avatar: Avatar;
-            public player;
-            public playerOutline;
-            public playerText;
             public cursors;
             public layers = {};
             public layerProperties = {} as {[x: string]: LayerPropertyDict};
@@ -118,9 +115,10 @@
             preload() {
                 this.load.tilemapTiledJSON(config.slug + 'map', config.mapUrl);
                 config.tilesets.forEach((tileset) => {
-                    this.load.image(tileset.name, tileset.url);
+                    if (!this.textures.exists(tileset.name)) {
+                        this.load.image(tileset.name, tileset.url);
+                    }
                 })
-                this.load.image('face', $user.avatar + '-small.png');
                 this.avatar = new Avatar(this, {
                     id: $user.id,
                     avatar: $user.avatar,
