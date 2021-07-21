@@ -104,6 +104,7 @@ This e-mail is automatically generated. Please do not reply to it.
                     'name': self.user.name,
                     'email': self.user.email,
                     'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}',
+                    'roles': self.user.roles,
                 }
             })
 

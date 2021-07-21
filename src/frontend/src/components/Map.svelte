@@ -3,7 +3,7 @@
     import { useNavigate, useParams } from 'svelte-navigator';
     import * as Phaser from 'phaser';
 
-    import { rooms, action, executeAction, user, sendMessage, messages } from '../store';
+    import { rooms, badges, action, executeAction, user, sendMessage, messages } from '../store';
 
     interface LayerProperty {
         name: string;
@@ -28,6 +28,7 @@
         private face: Phaser.GameObjects.Image;
         private text: Phaser.GameObjects.Text;
         private outline: Phaser.GameObjects.Graphics;
+        private badges: [number, number, Phaser.GameObjects.Image][];
 
         constructor(scene: Phaser.Scene, user: UpdateAvatarLocationUserPayload) {
             this.scene = scene;
@@ -37,7 +38,14 @@
         }
 
         preload() {
-            this.scene.load.image('user.' + this.user.id, this.user.avatar + '-small.png');
+            if (!this.scene.textures.exists('user.' + this.user.id)) {
+                this.scene.load.image('user.' + this.user.id, this.user.avatar + '-small.png');
+            }
+            $badges.forEach((badge) => {
+                if (!this.scene.textures.exists('badge.' + badge.role)) {
+                    this.scene.load.image('badge.' + badge.role, badge.url);
+                }
+            });
         }
 
         create() {
@@ -52,6 +60,27 @@
             this.outline.strokeCircle(0, 0, 24);
             this.outline.x = this.face.x;
             this.outline.y = this.face.y;
+            this.badges = [];
+            this.user.roles.forEach((role, idx) => {
+                if (idx < 4) {
+                    let offsetX = 0;
+                    let offsetY = 0;
+                    if (idx === 0) {
+                        offsetX = -24;
+                        offsetY = 24;
+                    } else if (idx === 1) {
+                        offsetX = 24;
+                        offsetY = 24;
+                    } else if (idx === 2) {
+                        offsetX = -24;
+                        offsetY = -24;
+                    } else if (idx === 3) {
+                        offsetX = 24;
+                        offsetY = -24;
+                    }
+                    this.badges.push([offsetX, offsetY, this.scene.add.image(this.face.x + offsetX, this.face.y + offsetY, 'badge.' + role)]);
+                }
+           });
         }
 
         follow() {
@@ -64,14 +93,18 @@
             if (this.face) {
                 this.face.x = this.x * 48 + 24;
                 this.face.y = this.y * 48 + 24;
-            }
-            if (this.text) {
-                this.text.x = this.face.x;
-                this.text.y = this.face.y + 28;
-            }
-            if (this.outline) {
-                this.outline.x = this.face.x;
-                this.outline.y = this.face.y;
+                if (this.text) {
+                    this.text.x = this.face.x;
+                    this.text.y = this.face.y + 28;
+                }
+                if (this.outline) {
+                    this.outline.x = this.face.x;
+                    this.outline.y = this.face.y;
+                }
+                this.badges.forEach(([offsetX, offsetY, badge]) => {
+                    badge.x = this.face.x + offsetX;
+                    badge.y = this.face.y + offsetY;
+                });
             }
         }
 
@@ -122,7 +155,8 @@
                 this.avatar = new Avatar(this, {
                     id: $user.id,
                     avatar: $user.avatar,
-                    name: $user.name
+                    name: $user.name,
+                    roles: $user.roles,
                 });
                 this.avatar.preload();
             }

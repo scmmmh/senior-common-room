@@ -20,7 +20,8 @@ class RoomMixin():
                                     'user': {
                                         'id': self.user.id,
                                         'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}',
-                                        'name': self.user.name
+                                        'name': self.user.name,
+                                        'roles': self.user.roles,
                                     },
                                     'room': message['payload']['room'],
                                     'x': message['payload']['x'],
