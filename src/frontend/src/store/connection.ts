@@ -13,6 +13,7 @@ export const messages = writable({} as ApiMessage);
 let connection = null;
 let reconnectTimeout = -1;
 let reconnectCount = MAX_RECONNECT_ATTEMPTS + 1;
+let pingTimeout = -1;
 
 export function connect() {
     if (connection === null) {
@@ -32,6 +33,7 @@ export function connect() {
             connectionStatus.set(CONNECTED);
         });
         connection.addEventListener('close', () => {
+            window.clearTimeout(pingTimeout);
             connection = null;
             reconnectCount = reconnectCount - 1;
             if (reconnectCount >= 0) {
@@ -74,5 +76,11 @@ export const isDisconnected = derived(connectionStatus, (status) => {
 export function sendMessage(message: ApiMessage) {
     if (connection && connection.readyState === 1) {
         connection.send(JSON.stringify(message));
+        window.clearTimeout(pingTimeout);
+        pingTimeout = window.setTimeout(() => {
+            sendMessage({
+                type: 'ping',
+            });
+        }, 30000);
     }
 }
