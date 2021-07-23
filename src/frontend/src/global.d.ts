@@ -2,7 +2,7 @@
 
 interface ApiMessage {
     type: string;
-    payload?: AuthenticatePayload | RoomConfigPayload[] | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload;
+    payload?: AuthenticatePayload | RoomConfigPayload[] | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload | BadgeConfigPayload[];
 }
 
 interface AuthenticatePayload {
@@ -24,9 +24,11 @@ interface TilesetPayload {
 }
 
 interface UserPayload {
+    id: number;
     name: string;
     email: string;
     avatar: string;
+    roles: string[];
 }
 
 interface EnterJitsiRoomPayload {
@@ -63,8 +65,15 @@ interface UpdateAvatarLocationUserPayload {
     id: number;
     avatar: string;
     name: string;
+    roles: string[];
 }
 
 interface LeaveMapPayload {
     room: string;
+}
+
+interface BadgeConfigPayload {
+    title: string;
+    url: string;
+    role: string;
 }

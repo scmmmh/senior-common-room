@@ -11,3 +11,15 @@ class ConfigMixin():
             'type': 'rooms-config',
             'payload': self.config['rooms']
         })
+
+    async def get_badges_config(self, message):
+        if 'badges' in self.config:
+            await self.send_message({
+                'type': 'badges-config',
+                'payload': self.config['badges']
+            })
+        else:
+            await self.send_message({
+                'type': 'badges-config',
+                'payload': []
+            })

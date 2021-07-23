@@ -1,5 +1,4 @@
 import { writable, derived } from 'svelte/store';
-import { navigate } from 'svelte-navigator';
 
 import { messages, sendMessage } from './connection';
 import { executeAction } from './action';
@@ -65,7 +64,6 @@ messages.subscribe((data) => {
             if (window.location.search) {
                 window.location.search = '';
             }
-            navigate('/frontend/room/lobby');
         }
     } else if (data.type === 'authentication-failed') {
         authenticationStatus.set(AUTHENTICATION_FAILED);

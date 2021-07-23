@@ -3,7 +3,7 @@
     import { useNavigate, useParams } from 'svelte-navigator';
     import * as Phaser from 'phaser';
 
-    import { rooms, action, executeAction, user, sendMessage, messages } from '../store';
+    import { rooms, badges, action, executeAction, user, sendMessage, messages } from '../store';
 
     interface LayerProperty {
         name: string;
@@ -19,19 +19,121 @@
     let navTargetLayer = null;
     let lastScene = null;
 
+    class Avatar {
+
+        public x: number;
+        public y: number;
+        private scene: Phaser.Scene;
+        private user: UpdateAvatarLocationUserPayload;
+        private face: Phaser.GameObjects.Image;
+        private text: Phaser.GameObjects.Text;
+        private outline: Phaser.GameObjects.Graphics;
+        private badges: [number, number, Phaser.GameObjects.Image][];
+
+        constructor(scene: Phaser.Scene, user: UpdateAvatarLocationUserPayload) {
+            this.scene = scene;
+            this.user = user;
+            this.x = 0;
+            this.y = 0;
+        }
+
+        preload() {
+            if (!this.scene.textures.exists('user.' + this.user.id)) {
+                this.scene.load.image('user.' + this.user.id, this.user.avatar + '-small.png');
+            }
+            $badges.forEach((badge) => {
+                if (!this.scene.textures.exists('badge.' + badge.role)) {
+                    this.scene.load.image('badge.' + badge.role, badge.url);
+                }
+            });
+        }
+
+        create() {
+            this.face = this.scene.add.image(this.x * 48 + 24, this.y * 48 + 24, 'user.' + this.user.id);
+            this.face.setDepth(1);
+            this.text = this.scene.add.text(this.face.x, this.face.y + 28, this.user.name, { font: "14px Arial", fill: "#000" });
+            this.text.setStroke('#fff', 3);
+            this.text.setShadow(2, 2, "#333333", 2, true, true);
+            this.text.setOrigin(0.5, 0);
+            this.outline = this.scene.add.graphics();
+            this.outline.lineStyle(2, '0x374151', 1);
+            this.outline.strokeCircle(0, 0, 24);
+            this.outline.x = this.face.x;
+            this.outline.y = this.face.y;
+            this.badges = [];
+            this.user.roles.forEach((role, idx) => {
+                if (idx < 4) {
+                    let offsetX = 0;
+                    let offsetY = 0;
+                    if (idx === 0) {
+                        offsetX = -24;
+                        offsetY = 24;
+                    } else if (idx === 1) {
+                        offsetX = 24;
+                        offsetY = 24;
+                    } else if (idx === 2) {
+                        offsetX = -24;
+                        offsetY = -24;
+                    } else if (idx === 3) {
+                        offsetX = 24;
+                        offsetY = -24;
+                    }
+                    this.badges.push([offsetX, offsetY, this.scene.add.image(this.face.x + offsetX, this.face.y + offsetY, 'badge.' + role)]);
+                }
+           });
+        }
+
+        follow() {
+            this.scene.cameras.main.startFollow(this.face, true, 1, 1);
+        }
+
+        move(x: number, y: number) {
+            this.x = x;
+            this.y = y;
+            if (this.face) {
+                this.face.x = this.x * 48 + 24;
+                this.face.y = this.y * 48 + 24;
+                if (this.text) {
+                    this.text.x = this.face.x;
+                    this.text.y = this.face.y + 28;
+                }
+                if (this.outline) {
+                    this.outline.x = this.face.x;
+                    this.outline.y = this.face.y;
+                }
+                this.badges.forEach(([offsetX, offsetY, badge]) => {
+                    badge.x = this.face.x + offsetX;
+                    badge.y = this.face.y + offsetY;
+                });
+            }
+        }
+
+        moveDelta(xDelta: number, yDelta: number) {
+            this.move(this.x + xDelta, this.y + yDelta);
+        }
+
+        update(location: UpdateAvatarLocationPayload) {
+            this.move(location.x, location.y);
+        }
+
+        destroy() {
+            this.face.destroy();
+            this.text.destroy();
+            this.outline.destroy();
+        }
+    }
+
     function createRoom(config: RoomConfigPayload) {
         class Scene extends Phaser.Scene {
 
             public map: Phaser.Tilemaps.Tilemap;
-            public player;
-            public playerOutline;
-            public playerText;
+            private avatar: Avatar;
             public cursors;
             public layers = {};
             public layerProperties = {} as {[x: string]: LayerPropertyDict};
             private enterKey;
             private spaceKey;
-            private avatars;
+            private avatars: {[x: number]: Avatar};
 
             constructor () {
                 super(config.slug);
@@ -46,9 +148,17 @@
             preload() {
                 this.load.tilemapTiledJSON(config.slug + 'map', config.mapUrl);
                 config.tilesets.forEach((tileset) => {
-                    this.load.image(tileset.name, tileset.url);
+                    if (!this.textures.exists(tileset.name)) {
+                        this.load.image(tileset.name, tileset.url);
+                    }
                 })
-                this.load.image('face', $user.avatar + '-small.png');
+                this.avatar = new Avatar(this, {
+                    id: $user.id,
+                    avatar: $user.avatar,
+                    name: $user.name,
+                    roles: $user.roles,
+                });
+                this.avatar.preload();
             }
 
             create(data) {
@@ -66,41 +176,30 @@
                         return acc;
                     }, {}) as LayerPropertyDict;
                 });
-                this.player = this.add.image(24, 24, 'face');
-                this.playerText = this.add.text(this.player.x, this.player.y + 28, $user.name, { font: "14px Arial", fill: "#000" });
-                this.playerText.setStroke('#fff', 3);
-                this.playerText.setShadow(2, 2, "#333333", 2, true, true);
-                this.playerText.setOrigin(0.5, 0);
-                this.playerOutline = this.add.graphics();
-                this.playerOutline.lineStyle(2, '0x374151', 1);
-                this.playerOutline.strokeCircle(0, 0, 24);
-                this.playerOutline.x = this.player.x;
-                this.playerOutline.y = this.player.y;
+                this.avatar.create();
+                this.avatar.follow();
+                this.updatePlayerLocation(data);
 
                 this.cursors = this.input.keyboard.createCursorKeys();
-
-                this.cameras.main.startFollow(this.player, true, 1, 1);
-
-                this.updatePlayerLocation(data);
             }
 
             update(time, delta) {
                 let xDelta = 0;
                 let yDelta = 0;
-                if (this.input.keyboard.checkDown(this.cursors.left, 100) && this.player.x > 16) {
-                    xDelta = -48;
-                } else if (this.input.keyboard.checkDown(this.cursors.right, 100) && this.player.x < 1264) {
-                    xDelta = 48;
-                } else if (this.input.keyboard.checkDown(this.cursors.up, 100) && this.player.y > 16) {
-                    yDelta = -48;
-                } else if (this.input.keyboard.checkDown(this.cursors.down, 100) && this.player.y < 1264) {
-                    yDelta = 48;
+                if (this.input.keyboard.checkDown(this.cursors.left, 100) && this.avatar.x > 0) {
+                    xDelta = -1;
+                } else if (this.input.keyboard.checkDown(this.cursors.right, 100) && this.avatar.x < 26) {
+                    xDelta = 1;
+                } else if (this.input.keyboard.checkDown(this.cursors.up, 100) && this.avatar.y > 0) {
+                    yDelta = -1;
+                } else if (this.input.keyboard.checkDown(this.cursors.down, 100) && this.avatar.y < 26) {
+                    yDelta = 1;
                 } else if ((this.input.keyboard.checkDown(this.enterKey, 500) || this.input.keyboard.checkDown(this.spaceKey)) && $action) {
                     executeAction.set($action);
                 }
                 if (xDelta !== 0 || yDelta !== 0) {
                     const blocked = this.map.getTileLayerNames().map((layerName) => {
-                        const tile = this.layers[layerName].getTileAtWorldXY(this.player.x + xDelta, this.player.y + yDelta);
+                        const tile = this.layers[layerName].getTileAtWorldXY(this.avatar.x * 48 + 24 + xDelta * 48, this.avatar.y * 48 + 24 + yDelta * 48);
                         const layer = this.map.getLayer(layerName);
                         if (tile && layer) {
                             if (tile.properties.collides || (this.layerProperties[layerName] && this.layerProperties[layerName].collides)) {
@@ -112,25 +211,20 @@
                         return acc || val;
                     }, false);
                     if (!blocked) {
-                        this.player.x = this.player.x + xDelta;
-                        this.player.y = this.player.y + yDelta;
-                        this.playerOutline.x = this.player.x;
-                        this.playerOutline.y = this.player.y;
-                        this.playerText.x = this.player.x;
-                        this.playerText.y = this.player.y + 28;
+                        this.avatar.moveDelta(xDelta, yDelta);
 
                         sendMessage({
                             type: 'set-avatar-location',
                             payload: {
                                 room: config.slug,
-                                x: (this.player.x - 24) / 48,
-                                y: (this.player.y - 24) / 48,
+                                x: this.avatar.x,
+                                y: this.avatar.y
                             }
                         });
 
                         action.set(null);
                         this.map.getTileLayerNames().forEach((layerName) => {
-                            const tile = this.layers[layerName].getTileAtWorldXY(this.player.x, this.player.y);
+                            const tile = this.layers[layerName].getTileAtWorldXY(this.avatar.x * 48 + 24, this.avatar.y * 48 + 24);
                             const layer = this.map.getLayer(layerName);
                             if (tile && layer && this.layerProperties[layerName] && this.layerProperties[layerName].action) {
                                 const properties = this.layerProperties[layerName];
@@ -166,19 +260,14 @@
                             }
                             if (coords.length > 0) {
                                 const playerCoords = coords[Math.floor(Math.random() * coords.length)];
-                                this.player.x = playerCoords[0] * 48 + 24;
-                                this.player.y = playerCoords[1] * 48 + 24;
-                                this.playerOutline.x = this.player.x;
-                                this.playerOutline.y = this.player.y;
-                                this.playerText.x = this.player.x;
-                                this.playerText.y = this.player.y + 28;
+                                this.avatar.move(playerCoords[0], playerCoords[1]);
 
                                 sendMessage({
                                     type: 'set-avatar-location',
                                     payload: {
                                         room: config.slug,
-                                        x: (this.player.x - 24) / 48,
-                                        y: (this.player.y - 24) / 48,
+                                        x: playerCoords[0],
+                                        y: playerCoords[1],
                                     }
                                 });
                             }
@@ -198,31 +287,14 @@
 
             updateOtherAvatarLocation(data) {
                 if (this.avatars[data.user.id]) {
-                    const parts = this.avatars[data.user.id];
-                    if (parts.avatar && parts.outline && parts.text) {
-                        parts.avatar.x = data.x * 48 + 24;
-                        parts.avatar.y = data.y * 48 + 24;
-                        parts.outline.x = data.x * 48 + 24;
-                        parts.outline.y = data.y * 48 + 24;
-                        parts.text.x = data.x * 48 + 24;
-                        parts.text.y = data.y * 48 + 52;
-                    }
+                    this.avatars[data.user.id].move(data.x, data.y);
                 } else {
-                    this.avatars[data.user.id] = {};
-                    this.load.image('user.' + data.user.id, data.user.avatar + '-small.png');
+                    this.avatars[data.user.id] = new Avatar(this, data.user);
+                    this.avatars[data.user.id].preload();
                     this.load.once('complete', () => {
-                        const parts = this.avatars[data.user.id];
-                        if (parts !== undefined) {
-                            parts.avatar = this.add.image(data.x * 48 + 24, data.y * 48 + 24, 'user.' + data.user.id);
-                            parts.outline = this.add.graphics();
-                            parts.outline.lineStyle(2, '0x374151', 1);
-                            parts.outline.strokeCircle(0, 0, 24);
-                            parts.outline.x = data.x * 48 + 24;
-                            parts.outline.y = data.y * 48 + 24;
-                            parts.text = this.add.text(data.x * 48 + 24, data.y * 48 + 52, data.user.name, { font: "14px Arial", fill: "#000" });
-                            parts.text.setStroke('#fff', 3);
-                            parts.text.setShadow(2, 2, "#333333", 2, true, true);
-                            parts.text.setOrigin(0.5, 0);
+                        if (this.avatars[data.user.id]) {
+                            this.avatars[data.user.id].create();
+                            this.avatars[data.user.id].move(data.x, data.y);
                         }
                     });
                     this.load.start();
@@ -231,8 +303,8 @@
                         type: 'set-avatar-location',
                         payload: {
                             room: config.slug,
-                            x: (this.player.x - 24) / 48,
-                            y: (this.player.y - 24) / 48,
+                            x: this.avatar.x,
+                            y: this.avatar.y,
                         }
                     });
                 }
@@ -241,31 +313,14 @@
             removeOtherAvatar(data) {
                 console.log('Removing', data);
                 if (this.avatars[data.user] !== undefined) {
-                    const parts = this.avatars[data.user];
-                    if (parts.avatar) {
-                        parts.avatar.destroy();
-                    }
-                    if (parts.outline) {
-                        parts.outline.destroy();
-                    }
-                    if (parts.text) {
-                        parts.text.destroy();
-                    }
+                    this.avatars[data.user].destroy();
                     delete this.avatars[data.user];
                 }
             }
 
             clearOtherAvatars() {
                 Object.values(this.avatars).forEach((avatar) => {
-                    if (avatar.avatar) {
-                        avatar.avatar.destroy();
-                    }
-                    if (avatar.outline) {
-                        avatar.outline.destroy();
-                    }
-                    if (avatar.text) {
-                        avatar.text.destroy();
-                    }
+                    avatar.destroy();
                 });
                 this.avatars = {};
             }

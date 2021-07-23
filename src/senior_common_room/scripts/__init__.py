@@ -91,6 +91,29 @@ CONFIG_SCHEMA = {
             }
         }
     },
+    'badges': {
+        'type': 'list',
+        'schema': {
+            'type': 'dict',
+            'schema': {
+                'title': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False
+                },
+                'url': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False
+                },
+                'role': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                }
+            }
+        }
+    },
     'email': {
         'type': 'dict',
         'required': True,
