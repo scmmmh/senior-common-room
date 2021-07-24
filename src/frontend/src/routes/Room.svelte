@@ -20,7 +20,7 @@
     }
 </script>
 
-<div class="v-full h-full overflow-hidden">
+<div class="v-full h-full overflow-hidden flex">
     {#if $roomConfig}
         <h1 class="sr-only">{$roomConfig.label}</h1>
         <Map/>

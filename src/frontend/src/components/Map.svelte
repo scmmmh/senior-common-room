@@ -331,7 +331,7 @@
 
     const phaserConfig = {
         type: Phaser.AUTO,
-        backgroundColor: '#222222',
+        backgroundColor: '#1F2937',
 	    scale: {
             mode: Phaser.Scale.RESIZE,
             autoCenter: Phaser.Scale.CENTER_BOTH
@@ -409,4 +409,4 @@
     });
 </script>
 
-<div id="game" class="v-full h-full"></div>
+<div id="game" class="flex-1"></div>

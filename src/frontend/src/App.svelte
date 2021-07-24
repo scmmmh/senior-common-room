@@ -7,8 +7,10 @@ import Authentication from './components/Authentication.svelte';
 import Room from './routes/Room.svelte';
 import Overlay from './components/Overlay.svelte';
 import Onboarding from './components/Onboarding.svelte';
+import Admin from './components/Admin.svelte';
+import Messages from './components/Messages.svelte';
 
-import { connect, isConnected, isAuthenticated, isOnboarded } from './store';
+import { connect, isConnected, isAuthenticated, isOnboarded, user } from './store';
 
 connect();
 </script>
@@ -22,7 +24,11 @@ connect();
 					<div class="flex-1 overflow-hidden">
 						<Route path='/room/:rid' let:params><Room rid={params.rid}/></Route>
 					</div>
+					<Messages/>
 					<Overlay/>
+					{#if $user.roles.indexOf('admin') >= 0}
+						<Admin/>
+					{/if}
 				</Router>
 			{:else}
 				<Onboarding/>

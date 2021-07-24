@@ -6,6 +6,8 @@
     function changeValue(ev: Event) {
         if (type === 'checkbox' || type === 'radio') {
             value = (ev.target as HTMLInputElement).checked;
+        } else if (type === 'textarea') {
+            value = (ev.target as HTMLTextAreaElement).value;
         } else {
             value = (ev.target as HTMLInputElement).value
         }
@@ -16,7 +18,14 @@
     <label class="block mb-4">
         <input type={type} on:change={changeValue} checked={value}/><span class="inline-block uppercase tracking-wider text-sm pl-2 pb-1"><slot></slot></span>
         {#if error !== ''}
-            <span>{error}</span>
+            <span class="block pt-1 text-red-600 text-sm">{error}</span>
+        {/if}
+    </label>
+{:else if type === 'textarea'}
+    <label class="block mb-4"><slot></slot>
+        <textarea on:change={changeValue} class="border-1 border-gray-200 px-2 py-2 w-full h-40 focus:shadow-inner">{value}</textarea>
+        {#if error !== ''}
+            <span class="block pt-1 text-red-600 text-sm">{error}</span>
         {/if}
     </label>
 {:else}

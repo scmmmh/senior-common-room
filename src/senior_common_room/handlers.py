@@ -9,13 +9,14 @@ from .api.config import ConfigMixin
 from .api.jitsi import JitsiMixin
 from .api.user import UserMixin
 from .api.room import RoomMixin
+from .api.messages import MessagesMixin
 from .models import create_sessionmaker
 
 
 logger = logging.getLogger(__name__)
 
 
-class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin):
+class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin, MessagesMixin):
 
     def initialize(self, config):
         self.config = config
@@ -30,6 +31,7 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
         logger.debug('Opening websocket connection')
         await self.mqtt.connect(timeout=5)
         await self.send_message({'type': 'authentication-required'})
+        await self.setup_messages_task()
         logger.debug('Websocket connection opened')
 
     def on_close(self):
@@ -39,6 +41,7 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
             self.user_mqtt_task.cancel()
         if self.room_mqtt_task:
             self.room_mqtt_task.cancel()
+        self.teardown_messages_task()
         IOLoop.current().add_callback(self.mqtt.disconnect)
 
     async def on_mqtt_messages(self, topic):
@@ -52,6 +55,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.room_update_avatar_location(json.loads(message.payload.decode()))
                 elif message.topic.startswith('room/') and message.topic.endswith('/leave'):
                     await self.room_remove_avatar(json.loads(message.payload.decode()))
+                elif message.topic.startswith('messages/'):
+                    await self.receive_broadcast_message(json.loads(message.payload.decode()))
                 else:
                     logger.debug(message.topic)
 
@@ -79,6 +84,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.room_set_avatar_location(message)
                 elif message['type'] == 'leave-room':
                     await self.leave_room(message)
+                elif message['type'] == 'broadcast-message':
+                    await self.send_broadcast_message(message)
                 else:
                     logger.debug(data)
             else:
