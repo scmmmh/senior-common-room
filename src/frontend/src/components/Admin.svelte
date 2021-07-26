@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-
     import Button from './Button.svelte';
+    import Modal from './Modal.svelte';
     import Dialog from './Dialog.svelte';
     import InputField from './InputField.svelte';
     import { sendMessage } from '../store';
@@ -12,7 +11,9 @@
     let broadcastMessage = '';
     let broadcastError = '';
 
-    function sendBroadcastMessage() {
+    function sendBroadcastMessage(ev) {
+        console.log('hm');
+        ev.preventDefault();
         if (broadcastMessage.trim() !== '') {
             sendMessage({
                 type: 'broadcast-message',
@@ -46,20 +47,22 @@
                 </ul>
             </nav>
             {#if showSendBroadcast}
-                <div transition:fade="{{ duration: 100 }}" on:click={() => { showSendBroadcast = false; }} class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-10">
-                    <Dialog class="bg-white text-black">
-                        <span slot="title">Send a broadcast message</span>
-                        <div slot="content">
-                            <InputField type="textarea" bind:value={broadcastMessage} error={broadcastError}>
-                                Message
-                            </InputField>
-                        </div>
-                        <div slot="actions">
-                            <Button on:click={() => { showSendBroadcast = false; }} type="secondary">Don't Send</Button>
-                            <Button on:click={sendBroadcastMessage} type="primary">Send</Button>
-                        </div>
-                    </Dialog>
-                </div>
+                <form on:submit={sendBroadcastMessage}>
+                    <Modal let:close={modalClose} on:close={() => { showSendBroadcast = false; }}>
+                        <Dialog class="bg-white text-black">
+                            <span slot="title">Send a broadcast message</span>
+                            <div slot="content">
+                                <InputField type="textarea" bind:value={broadcastMessage} error={broadcastError}>
+                                    Broadcast message to send
+                                </InputField>
+                            </div>
+                            <div slot="actions">
+                                <Button on:click={(ev) => { ev.preventDefault(); modalClose(); }} type="secondary">Don't Send</Button>
+                                <Button type="primary">Send</Button>
+                            </div>
+                        </Dialog>
+                    </Modal>
+                </form>
             {/if}
         {/if}
     </div>

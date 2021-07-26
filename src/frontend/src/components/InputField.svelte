@@ -12,6 +12,8 @@
             value = (ev.target as HTMLInputElement).value
         }
     }
+
+    // TODO: Make stop propagation configurable
 </script>
 
 {#if type === 'checkbox' || type === 'radio'}
@@ -23,7 +25,7 @@
     </label>
 {:else if type === 'textarea'}
     <label class="block mb-4"><slot></slot>
-        <textarea on:change={changeValue} class="border-1 border-gray-200 px-2 py-2 w-full h-40 focus:shadow-inner">{value}</textarea>
+        <textarea on:change={changeValue} on:keydown={(ev) => { ev.stopPropagation(); }} on:keyup={(ev) => { ev.stopPropagation(); }} class="border-1 border-gray-200 px-2 py-2 w-full h-40 focus:shadow-inner whitespace-pre-wrap">{value}</textarea>
         {#if error !== ''}
             <span class="block pt-1 text-red-600 text-sm">{error}</span>
         {/if}
