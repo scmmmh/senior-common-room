@@ -4,6 +4,7 @@
     import * as Phaser from 'phaser';
 
     import { rooms, badges, action, executeAction, user, sendMessage, messages } from '../store';
+    import UserList from '../components/UserList.svelte';
 
     interface LayerProperty {
         name: string;
@@ -18,6 +19,7 @@
     let game = null;
     let navTargetLayer = null;
     let lastScene = null;
+    let userList = [];
 
     class Avatar {
 
@@ -389,9 +391,37 @@
             if (game) {
                 game.scene.getScene(lastScene).updateOtherAvatarLocation(message.payload);
             }
+            let exists = false;
+            let insertIdx = null;
+            userList.forEach((user, idx) => {
+                if (user.id === message.payload.user.id) {
+                    exists = true;
+                }
+                if (user.name >= message.payload.user.name) {
+                    insertIdx = idx;
+                }
+            });
+            if (!exists) {
+                if (insertIdx === null) {
+                    userList.push(message.payload.user);
+                } else {
+                    userList.splice(insertIdx, 0, message.payload.user);
+                }
+            }
+            userList = userList;
         } else if (message.type === 'remove-avatar') {
             if (game) {
                 game.scene.getScene(lastScene).removeOtherAvatar(message.payload);
+            }
+            let removeIdx = -1;
+            userList.forEach((user, idx) => {
+                if (user.id === message.payload.user) {
+                    removeIdx = idx;
+                }
+            });
+            if (removeIdx >= 0) {
+                userList.splice(removeIdx, 1);
+                userList = userList;
             }
         }
     });
@@ -410,3 +440,4 @@
 </script>
 
 <div id="game" class="flex-1"></div>
+<UserList users={userList}/>
