@@ -30,7 +30,7 @@
     }
 </script>
 
-<div class="fixed right-0 top-20 z-10">
+<div class="fixed right-0 top-20 z-50">
     <div class="bg-gray-700 text-white rounded-l-lg py-4 pl-4 pr-2">
         <h2 class="sr-only">Administration</h2>
         <div class="{visible ? 'mb-4' : ''}">

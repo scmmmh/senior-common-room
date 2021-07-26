@@ -4,7 +4,7 @@
 
 	const dispatch = createEventDispatcher();
 
-    export let countdown = 10;
+    export let countdown = 30;
     const circumference = 28 * Math.PI;
     let circle;
     let current = 0;
