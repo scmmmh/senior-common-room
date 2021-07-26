@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 
 const INITIAL = 0;
 const CONNECTING = 1;
@@ -11,13 +11,22 @@ const MAX_RECONNECT_ATTEMPTS = 8;
 const connectionStatus = writable(INITIAL);
 export const messages = writable({} as ApiMessage);
 let connection = null;
-let reconnectTimeout = -1;
+let reconnectInterval = -1;
+export const reconnectWait = writable(0);
 let reconnectCount = MAX_RECONNECT_ATTEMPTS + 1;
 let pingTimeout = -1;
 
+function reconnectCountdown() {
+    reconnectWait.update((value) => { return value - 1});
+    if (get(reconnectWait) <= 0 ) {
+        window.clearInterval(reconnectInterval);
+        connect();
+    }
+}
+
 export function connect() {
     if (connection === null) {
-        clearTimeout(reconnectTimeout)
+        window.clearInterval(reconnectInterval)
         if (reconnectCount === 6) {
             connectionStatus.set(CONNECTING);
         } else {
@@ -38,9 +47,8 @@ export function connect() {
             reconnectCount = reconnectCount - 1;
             if (reconnectCount >= 0) {
                 connectionStatus.set(DISCONNECTED);
-                reconnectTimeout = window.setTimeout(() => {
-                    connect();
-                }, Math.pow(MAX_RECONNECT_ATTEMPTS - reconnectCount, 2) * 1000 + 50);
+                reconnectWait.set(Math.pow(MAX_RECONNECT_ATTEMPTS - reconnectCount, 2));
+                reconnectInterval = window.setInterval(reconnectCountdown, 1000);
             } else {
                 connectionStatus.set(FAILED);
             }
