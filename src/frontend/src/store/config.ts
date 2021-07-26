@@ -16,8 +16,17 @@ messages.subscribe((message) => {
         });
     } else if (message.type === 'rooms-config') {
         const firstLoad = (get(rooms).length === 0);
+        const pathElements = window.location.pathname.split('/');
+        let redirect = true;
+        if (pathElements.length > 0) {
+            (message.payload as RoomConfigPayload[]).forEach((room) => {
+                if (room.slug == pathElements[pathElements.length - 1]) {
+                    redirect = false;
+                }
+            });
+        }
         rooms.set(message.payload as RoomConfigPayload[]);
-        if (firstLoad && (message.payload as RoomConfigPayload[]).length > 0) {
+        if (redirect && (message.payload as RoomConfigPayload[]).length > 0) {
             navigate('/frontend/room/' + (message.payload as RoomConfigPayload[])[0].slug);
         }
     } else if (message.type === 'badges-config') {
