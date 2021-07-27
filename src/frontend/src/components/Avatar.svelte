@@ -1,41 +1,17 @@
 <script lang="ts">
     import { slide } from 'svelte/transition';
 
-    import { sendMessage } from '../store';
-    import Modal from './Modal.svelte';
-    import Dialog from './Dialog.svelte';
+    import SendMessage from './SendMessage.svelte';
     import Button from './Button.svelte';
-    import InputField from './InputField.svelte';
 
     export let avatar: UpdateAvatarLocationPayload;
     export let x: number;
     export let y: number;
     let distance = Math.sqrt(Math.pow(Math.abs(x - avatar.x), 2) + Math.pow(Math.abs(y - avatar.y), 2));
     let showUserMessage = false;
-    let userMessage = '';
-    let userMessageError = '';
 
     $: {
         distance = Math.sqrt(Math.pow(Math.abs(x - avatar.x), 2) + Math.pow(Math.abs(y - avatar.y), 2));
-    }
-
-    function sendUserMessage(ev: Event) {
-        ev.preventDefault();
-        if (userMessage.trim() !== '') {
-            sendMessage({
-                type: 'user-message',
-                payload: {
-                    user: {
-                        id: avatar.user.id,
-                    },
-                    message: userMessage.trim(),
-                }
-            });
-            userMessageError = '';
-            showUserMessage = false;
-        } else {
-            userMessageError = 'Please provide a message';
-        }
     }
 </script>
 
@@ -64,22 +40,7 @@
             </ul>
         </nav>
         {#if showUserMessage}
-            <form on:submit={sendUserMessage}>
-                <Modal let:close={modalClose} on:close={() => { showUserMessage = false; }}>
-                    <Dialog>
-                        <span slot="title">Send a message to {avatar.user.name}</span>
-                        <div slot="content">
-                            <InputField type="textarea" bind:value={userMessage} error={userMessageError}>
-                                Message
-                            </InputField>
-                        </div>
-                        <div slot="actions">
-                            <Button on:click={(ev) => { ev.preventDefault(); modalClose(); }} type="secondary">Don't Send</Button>
-                            <Button type="primary">Send</Button>
-                        </div>
-                    </Dialog>
-                </Modal>
-            </form>
+            <SendMessage on:close={() => { showUserMessage = false; }} type="user-message" user={avatar.user}>Send message to {avatar.user.name}</SendMessage>
         {/if}
     </div>
 </li>

@@ -3,6 +3,7 @@
     import Modal from './Modal.svelte';
     import Dialog from './Dialog.svelte';
     import InputField from './InputField.svelte';
+    import SendMessage from './SendMessage.svelte';
     import { sendMessage } from '../store';
 
     let visible = false;
@@ -46,22 +47,7 @@
                 </ul>
             </nav>
             {#if showSendBroadcast}
-                <form on:submit={sendBroadcastMessage}>
-                    <Modal let:close={modalClose} on:close={() => { showSendBroadcast = false; }}>
-                        <Dialog class="bg-white text-black">
-                            <span slot="title">Send a broadcast message</span>
-                            <div slot="content">
-                                <InputField type="textarea" bind:value={broadcastMessage} error={broadcastError}>
-                                    Broadcast message to send
-                                </InputField>
-                            </div>
-                            <div slot="actions">
-                                <Button on:click={(ev) => { ev.preventDefault(); modalClose(); }} type="secondary">Don't Send</Button>
-                                <Button type="primary">Send</Button>
-                            </div>
-                        </Dialog>
-                    </Modal>
-                </form>
+                <SendMessage on:close={() => { showSendBroadcast = false; }} type="broadcast-message">Send a broadcast message</SendMessage>
             {/if}
         {/if}
     </div>

@@ -4,9 +4,11 @@
     import { messages, user } from '../store';
     import Message from './Message.svelte';
     import Button from './Button.svelte';
+    import SendMessage from './SendMessage.svelte';
 
     let currentMessages = [];
     let nextMessageId = 1;
+    let showUserMessage = false;
 
     const unsubscribeMessages = messages.subscribe((message) => {
         if (message.type === 'broadcast-message') {
@@ -49,7 +51,7 @@
 <div class="fixed right-0 bottom-0 px-7 w-full md:w-1/3 lg:w-1/4 z-50">
     <ol>
         {#each currentMessages as msg (msg.id)}
-            <Message on:close={() => { closeMessage(msg.id); }}>
+            <Message on:close={() => { closeMessage(msg.id); }} countdown={msg.payload.type === 'broadcast' ? 30 : 15}>
                 {#if msg.payload.type === 'broadcast'}
                     <div>
                         <div class="border-yellow-400 border-b-1 pb-2 mb-2">
@@ -64,13 +66,16 @@
                         <div class="border-yellow-400 border-b-1 pb-2 mb-2 flex items-center">
                             <img src="{msg.payload.user.avatar}-small.png" alt="" class="w-6 h-6 flex-0"/>
                             <span class="flex-1 tracking-wider px-2">{msg.payload.user.name}</span>
-                            <Button type="icon">
+                            <Button on:click={() => { showUserMessage = true; }} type="icon">
                                 <svg viewBox="0 0 24 24" class="w-6 h-6">
                                     <path fill="currentColor" d="M18,8H6V6H18V8M18,11H6V9H18V11M18,14H6V12H18V14M22,4A2,2 0 0,0 20,2H4A2,2 0 0,0 2,4V16A2,2 0 0,0 4,18H18L22,22V4Z" />
                                 </svg>
                             </Button>
                         </div>
                         {@html format(msg.payload.message)}
+                        {#if showUserMessage}
+                            <SendMessage on:close={(ev) => { showUserMessage = false; if (ev.detail.sent) { closeMessage(msg.id); } }} type="user-message" user={msg.payload.user}>Send message to {msg.payload.user.name}</SendMessage>
+                        {/if}
                     </div>
                 {/if}
             </Message>
