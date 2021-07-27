@@ -406,8 +406,7 @@
                 }
             });
             if (existIdx !== null) {
-                avatarList[existIdx].x = message.payload.x;
-                avatarList[existIdx].y = message.payload.y;
+                avatarList[existIdx] = message.payload;
             } else {
                 if (insertIdx === null) {
                     avatarList.push(message.payload);
