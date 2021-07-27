@@ -4,7 +4,7 @@
     import * as Phaser from 'phaser';
 
     import { rooms, badges, action, executeAction, user, sendMessage, messages } from '../store';
-    import UserList from '../components/UserList.svelte';
+    import AvatarList from './AvatarList.svelte';
 
     interface LayerProperty {
         name: string;
@@ -19,7 +19,9 @@
     let game = null;
     let navTargetLayer = null;
     let lastScene = null;
-    let userList = [];
+    let avatarList = [];
+    let myX = 0;
+    let myY = 0;
 
     class Avatar {
 
@@ -214,6 +216,8 @@
                     }, false);
                     if (!blocked) {
                         this.avatar.moveDelta(xDelta, yDelta);
+                        myX = this.avatar.x;
+                        myY = this.avatar.y;
 
                         sendMessage({
                             type: 'set-avatar-location',
@@ -391,37 +395,40 @@
             if (game) {
                 game.scene.getScene(lastScene).updateOtherAvatarLocation(message.payload);
             }
-            let exists = false;
+            let existIdx = null;
             let insertIdx = null;
-            userList.forEach((user, idx) => {
-                if (user.id === message.payload.user.id) {
-                    exists = true;
+            avatarList.forEach((avatar, idx) => {
+                if (avatar.user.id === message.payload.user.id) {
+                    existIdx = idx;
                 }
-                if (user.name >= message.payload.user.name) {
+                if (avatar.user.name >= message.payload.user.name) {
                     insertIdx = idx;
                 }
             });
-            if (!exists) {
+            if (existIdx !== null) {
+                avatarList[existIdx].x = message.payload.x;
+                avatarList[existIdx].y = message.payload.y;
+            } else {
                 if (insertIdx === null) {
-                    userList.push(message.payload.user);
+                    avatarList.push(message.payload);
                 } else {
-                    userList.splice(insertIdx, 0, message.payload.user);
+                    avatarList.splice(insertIdx, 0, message.payload);
                 }
             }
-            userList = userList;
+            avatarList = avatarList;
         } else if (message.type === 'remove-avatar') {
             if (game) {
                 game.scene.getScene(lastScene).removeOtherAvatar(message.payload);
             }
             let removeIdx = -1;
-            userList.forEach((user, idx) => {
-                if (user.id === message.payload.user) {
+            avatarList.forEach((avatar, idx) => {
+                if (avatar.user.id === message.payload.user) {
                     removeIdx = idx;
                 }
             });
             if (removeIdx >= 0) {
-                userList.splice(removeIdx, 1);
-                userList = userList;
+                avatarList.splice(removeIdx, 1);
+                avatarList = avatarList;
             }
         }
     });
@@ -440,4 +447,4 @@
 </script>
 
 <div id="game" class="flex-1"></div>
-<UserList users={userList}/>
+<AvatarList avatars={avatarList} x={myX} y={myY}/>
