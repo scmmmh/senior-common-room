@@ -47,7 +47,7 @@
                 </ul>
             </nav>
             {#if showSendBroadcast}
-                <SendMessage on:close={() => { showSendBroadcast = false; }} type="broadcast-message">Send a broadcast message</SendMessage>
+                <SendMessage on:close={() => { showSendBroadcast = false; visible = false; }} type="broadcast-message">Send a broadcast message</SendMessage>
             {/if}
         {/if}
     </div>
