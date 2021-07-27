@@ -2,7 +2,7 @@
 
 interface ApiMessage {
     type: string;
-    payload?: AuthenticatePayload | RoomConfigPayload[] | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload | BadgeConfigPayload[] | BroadcastMessagePayload;
+    payload?: AuthenticatePayload | RoomConfigPayload[] | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload | BadgeConfigPayload[] | BroadcastMessagePayload | UserMessagePayload;
 }
 
 interface AuthenticatePayload {
@@ -80,4 +80,15 @@ interface BadgeConfigPayload {
 
 interface BroadcastMessagePayload {
     message: string;
+}
+
+interface UserMessagePayload {
+    user: UserPartialPayload;
+    message: string;
+}
+
+interface UserPartialPayload {
+    id: number;
+    name?: string;
+    avatar?: string;
 }

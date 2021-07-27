@@ -57,6 +57,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.room_remove_avatar(json.loads(message.payload.decode()))
                 elif message.topic.startswith('messages/'):
                     await self.receive_broadcast_message(json.loads(message.payload.decode()))
+                elif message.topic == f'user/{self.user.id}/message':
+                    await self.receive_user_message(json.loads(message.payload.decode()))
                 else:
                     logger.debug(message.topic)
 
@@ -86,6 +88,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.leave_room(message)
                 elif message['type'] == 'broadcast-message':
                     await self.send_broadcast_message(message)
+                elif message['type'] == 'user-message':
+                    await self.send_user_message(message)
                 else:
                     logger.debug(data)
             else:

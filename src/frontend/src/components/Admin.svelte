@@ -12,7 +12,6 @@
     let broadcastError = '';
 
     function sendBroadcastMessage(ev) {
-        console.log('hm');
         ev.preventDefault();
         if (broadcastMessage.trim() !== '') {
             sendMessage({
@@ -30,7 +29,7 @@
     }
 </script>
 
-<div class="fixed right-0 top-0 h-screen pt-20 pb-4 z-50">
+<div class="fixed right-0 top-0 h-screen pt-20 pb-4 z-40">
     <div class="bg-gray-700 text-white rounded-l-lg py-4 pl-4 pr-2">
         <h2 class="sr-only">Administration</h2>
         <div class="{visible ? 'mb-4' : ''}">

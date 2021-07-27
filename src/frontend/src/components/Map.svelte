@@ -317,7 +317,6 @@
             }
 
             removeOtherAvatar(data) {
-                console.log('Removing', data);
                 if (this.avatars[data.user] !== undefined) {
                     this.avatars[data.user].destroy();
                     delete this.avatars[data.user];
