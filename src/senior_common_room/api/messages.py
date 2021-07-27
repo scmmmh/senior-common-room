@@ -1,9 +1,20 @@
 import asyncio
+import bleach
 import json
 import logging
 
 
 logger = logging.getLogger(__name__)
+
+
+def safe_text(text: str) -> str:
+    return bleach.clean(text,
+                        tags=['strong', 'em'],
+                        attributes=[],
+                        styles=[],
+                        protocols=[],
+                        strip=True,
+                        strip_comments=True)
 
 
 class MessagesMixin():
@@ -16,7 +27,7 @@ class MessagesMixin():
     async def send_broadcast_message(self, message):
         await self.mqtt.publish(f'messages/broadcast',
                                 payload=json.dumps({
-                                    'message': message['payload']['message']
+                                    'message': safe_text(message['payload']['message'])
                                 }))
 
     async def receive_broadcast_message(self, message):
@@ -35,7 +46,7 @@ class MessagesMixin():
                                         'name': self.user.name,
                                         'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}'
                                     },
-                                    'message': message['payload']['message']
+                                    'message': safe_text(message['payload']['message'])
                                 }))
 
     async def receive_user_message(self, message):
