@@ -1,6 +1,8 @@
 <script lang="ts">
     import { slide } from 'svelte/transition';
 
+    import Button from './Button.svelte';
+
     export let avatar: UpdateAvatarLocationPayload;
     export let x: number;
     export let y: number;
@@ -18,19 +20,19 @@
         <nav>
             <ul class="flex">
                 <li class="flex-0">
-                    <button class="block p-2" aria-label="Send a message">
+                    <Button type="icon" class="block" aria-label="Send a message">
                         <svg viewBox="0 0 24 24" class="w-6 h-6">
                             <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M6,9H18V11H6M14,14H6V12H14M18,8H6V6H18" />
                         </svg>
-                    </button>
+                    </Button>
                 </li>
                 {#if distance < 3}
                     <li class="flex-0">
-                        <button class="block p-2" aria-label="Start a video chat">
+                        <Button type="icon" class="block" aria-label="Start a video chat">
                             <svg viewBox="0 0 24 24" class="w-6 h-6">
                                 <path fill="currentColor" d="M18,14L14,10.8V14H6V6H14V9.2L18,6M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
                             </svg>
-                        </button>
+                        </Button>
                     </li>
                 {/if}
             </ul>
