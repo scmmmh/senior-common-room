@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
     import { slide } from 'svelte/transition';
 
+    import { sendMessage } from '../store';
     import SendMessage from './SendMessage.svelte';
     import Button from './Button.svelte';
 
@@ -9,9 +11,23 @@
     export let y: number;
     let distance = Math.sqrt(Math.pow(Math.abs(x - avatar.x), 2) + Math.pow(Math.abs(y - avatar.y), 2));
     let showUserMessage = false;
+    const dispatch = createEventDispatcher();
 
     $: {
         distance = Math.sqrt(Math.pow(Math.abs(x - avatar.x), 2) + Math.pow(Math.abs(y - avatar.y), 2));
+    }
+
+    function requestVideoChat(ev: Event) {
+        ev.preventDefault();
+        sendMessage({
+            type: 'request-video-chat-message',
+            payload: {
+                user: {
+                    id: avatar.user.id
+                }
+            }
+        });
+        dispatch('close');
     }
 </script>
 
@@ -30,7 +46,7 @@
                 </li>
                 {#if distance < 3}
                     <li class="flex-0">
-                        <Button type="icon" class="block" aria-label="Start a video chat" title="Start a video chat">
+                        <Button type="icon" class="block" aria-label="Start a video chat" title="Start a video chat" on:click={requestVideoChat}>
                             <svg viewBox="0 0 24 24" class="w-6 h-6">
                                 <path fill="currentColor" d="M18,14L14,10.8V14H6V6H14V9.2L18,6M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
                             </svg>

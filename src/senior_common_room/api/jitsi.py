@@ -19,6 +19,7 @@ class JitsiMixin():
                                 }).encode())
 
     async def enter_jitsi_room(self, message):
+        self.jitsi_room_name = message['room_name']
         if 'jwt' in self.config['jitsi']:
             encoded_jwt = jwt.encode({
                 'iss': self.config['jitsi']['jwt']['application_id'],

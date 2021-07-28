@@ -21,7 +21,7 @@
         {#if visible}
             <ul class="flex-1 overflow-auto w-full md:w-60">
                 {#each avatars as avatar (avatar.user.id)}
-                    <Avatar avatar={avatar} x={x} y={y}/>
+                    <Avatar avatar={avatar} x={x} y={y} on:close={() => { visible = false; }}/>
                 {:else}
                     <li>You are currently on your own here</li>
                 {/each}

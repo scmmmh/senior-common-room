@@ -59,6 +59,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.receive_broadcast_message(json.loads(message.payload.decode()))
                 elif message.topic == f'user/{self.user.id}/message':
                     await self.receive_user_message(json.loads(message.payload.decode()))
+                elif message.topic == f'user/{self.user.id}/request-video-chat':
+                    await self.receive_request_video_chat_message(json.loads(message.payload.decode()))
                 else:
                     logger.debug(message.topic)
 
@@ -90,6 +92,10 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.send_broadcast_message(message)
                 elif message['type'] == 'user-message':
                     await self.send_user_message(message)
+                elif message['type'] == 'request-video-chat-message':
+                    await self.send_request_video_chat_message(message)
+                elif message['type'] == 'accept-video-chat-message':
+                    await self.send_accept_video_chat_message(message)
                 else:
                     logger.debug(data)
             else:

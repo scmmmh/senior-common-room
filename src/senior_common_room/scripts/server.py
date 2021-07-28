@@ -26,22 +26,42 @@ async def jitsi_room_state_server(config):
                 async for message in messages:
                     payload = json.loads(message.payload.decode())
                     room_name = message.topic.split('/')[1]
-                    if room_name not in jitsi_rooms:
+                    if room_name == 'random':
+                        room_name = token_hex(32)
+                        while room_name in jitsi_rooms:
+                            room_name = token_hex(32)
                         jitsi_rooms[room_name] = {
                             'url': token_hex(32),
                             'password': token_hex(32),
-                            'users': [payload['user']],
-                            'subject': payload['subject']
+                            'users': payload['users'],
+                            'subject': 'Private chat'
                         }
-                    elif payload['user'] not in jitsi_rooms[room_name]['users']:
-                        jitsi_rooms[room_name]['users'].append(payload['user'])
-                    logger.debug(f'Entering jitsi room for user/{payload["user"]}/enter-jitsi-room')
-                    await client.publish(f'user/{payload["user"]}/enter-jitsi-room',
-                                         payload=json.dumps({
-                                             'url': jitsi_rooms[room_name]['url'],
-                                             'password': jitsi_rooms[room_name]['password'],
-                                             'subject': jitsi_rooms[room_name]['subject']
-                                         }).encode())
+                        for user in payload['users']:
+                            await client.publish(f'user/{user}/enter-jitsi-room',
+                                                 payload=json.dumps({
+                                                     'room_name': room_name,
+                                                     'url': jitsi_rooms[room_name]['url'],
+                                                     'password': jitsi_rooms[room_name]['password'],
+                                                     'subject': jitsi_rooms[room_name]['subject']
+                                                 }).encode())
+                    else:
+                        if room_name not in jitsi_rooms:
+                            jitsi_rooms[room_name] = {
+                                'url': token_hex(32),
+                                'password': token_hex(32),
+                                'users': [payload['user']],
+                                'subject': payload['subject']
+                            }
+                        elif payload['user'] not in jitsi_rooms[room_name]['users']:
+                            jitsi_rooms[room_name]['users'].append(payload['user'])
+                        logger.debug(f'Entering jitsi room for user/{payload["user"]}/enter-jitsi-room')
+                        await client.publish(f'user/{payload["user"]}/enter-jitsi-room',
+                                             payload=json.dumps({
+                                                 'room_name': room_name,
+                                                 'url': jitsi_rooms[room_name]['url'],
+                                                 'password': jitsi_rooms[room_name]['password'],
+                                                 'subject': jitsi_rooms[room_name]['subject']
+                                             }).encode())
 
         async def leave_handler():
             async with client.filtered_messages("jitsi-rooms/+/leave") as messages:

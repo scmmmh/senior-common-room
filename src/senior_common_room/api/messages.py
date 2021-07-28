@@ -58,6 +58,30 @@ class MessagesMixin():
             }
         })
 
+    async def send_request_video_chat_message(self, message):
+        await self.mqtt.publish(f'user/{message["payload"]["user"]["id"]}/request-video-chat',
+                                payload=json.dumps({
+                                    'user': {
+                                        'id': self.user.id,
+                                        'name': self.user.name,
+                                        'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}'
+                                    }
+                                }))
+
+    async def receive_request_video_chat_message(self, message):
+        await self.send_message({
+            'type': 'request-video-chat',
+            'payload': {
+                'user': message['user']
+            }
+        })
+
+    async def send_accept_video_chat_message(self, message):
+        await self.mqtt.publish(f'jitsi-rooms/random/enter',
+                                payload=json.dumps({
+                                    'users': [self.user.id, message['payload']['user']['id']]
+                                }))
+
     def teardown_messages_task(self):
         if self.broadcast_messages_mqtt_task:
             self.broadcast_messages_mqtt_task.cancel()

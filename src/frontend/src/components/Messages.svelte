@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
 
-    import { messages, user } from '../store';
+    import { messages, user, sendMessage } from '../store';
     import Message from './Message.svelte';
     import Button from './Button.svelte';
     import SendMessage from './SendMessage.svelte';
@@ -32,6 +32,16 @@
             });
             currentMessages = currentMessages;
             nextMessageId = nextMessageId + 1;
+        } else if (message.type === 'request-video-chat') {
+            currentMessages.push({
+                id: nextMessageId,
+                payload: {
+                    type: 'video-chat-invite',
+                    user: (message.payload as RequestVideoChatPayload).user
+                }
+            });
+            currentMessages = currentMessages;
+            nextMessageId = nextMessageId + 1;
         }
     });
 
@@ -45,13 +55,34 @@
         return '<p>' + str + '</p>';
     }
 
+    function countdownLength(type: string): number {
+        if (type === 'broadcast') {
+            return 30;
+        } else if (type === 'video-chat-invite') {
+            return 30;
+        } else if (type === 'user') {
+            return 15;
+        } else {
+            return 10;
+        }
+    }
+
+    function acceptVideoChatInvite(user) {
+        sendMessage({
+            type: 'accept-video-chat-message',
+            payload: {
+                user: user
+            }
+        })
+    }
+
     onDestroy(unsubscribeMessages);
 </script>
 
 <div class="fixed right-0 bottom-0 px-7 w-full md:w-1/3 lg:w-1/4 z-50">
     <ol>
         {#each currentMessages as msg (msg.id)}
-            <Message on:close={() => { closeMessage(msg.id); }} countdown={msg.payload.type === 'broadcast' ? 30 : 15}>
+            <Message on:close={() => { closeMessage(msg.id); }} countdown={countdownLength(msg.payload.type)}>
                 {#if msg.payload.type === 'broadcast'}
                     <div>
                         <div class="border-yellow-400 border-b-1 pb-2 mb-2">
@@ -76,6 +107,22 @@
                         {#if showUserMessage}
                             <SendMessage on:close={(ev) => { showUserMessage = false; if (ev.detail.sent) { closeMessage(msg.id); } }} type="user-message" user={msg.payload.user}>Send message to {msg.payload.user.name}</SendMessage>
                         {/if}
+                    </div>
+                {:else if msg.payload.type === 'video-chat-invite'}
+                    <div>
+                        <div class="border-yellow-400 border-b-1 pb-2 mb-2 flex items-center">
+                            <img src="{msg.payload.user.avatar}-small.png" alt="" class="w-6 h-6 flex-0"/>
+                            <span class="flex-1 tracking-wider px-2">Video Chat Invitation</span>
+                        </div>
+                        <p class="mb-2">{msg.payload.user.name} would like to chat with you.</p>
+                        <div class="text-right">
+                            <Button on:click={() => { acceptVideoChatInvite(msg.payload.user); closeMessage(msg.id); }} type="primary-outline">
+                                Let's chat!
+                            </Button>
+                            <Button on:click={() => { closeMessage(msg.id); }} type="primary-outline">
+                                Not now, sorry.
+                            </Button>
+                        </div>
                     </div>
                 {/if}
             </Message>
