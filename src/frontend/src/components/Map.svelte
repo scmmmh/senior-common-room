@@ -183,6 +183,7 @@
                 this.avatar.create();
                 this.avatar.follow();
                 this.updatePlayerLocation(data);
+                this.updateAction(false);
 
                 this.cursors = this.input.keyboard.createCursorKeys();
             }
@@ -227,27 +228,32 @@
                                 y: this.avatar.y
                             }
                         });
-
-                        action.set(null);
-                        this.map.getTileLayerNames().forEach((layerName) => {
-                            const tile = this.layers[layerName].getTileAtWorldXY(this.avatar.x * 48 + 24, this.avatar.y * 48 + 24);
-                            const layer = this.map.getLayer(layerName);
-                            if (tile && layer && this.layerProperties[layerName] && this.layerProperties[layerName].action) {
-                                const properties = this.layerProperties[layerName];
-                                if (properties.action === 'switchRoom' && properties.immediate) {
-                                    if (properties.targetLayer) {
-                                        navTargetLayer = properties.targetLayer;
-                                    } else {
-                                        navTargetLayer = null;
-                                    }
-                                    navigate('/room/' + properties.roomSlug);
-                                } else {
-                                    action.set(properties);
-                                }
-                            }
-                        });
+                        this.updateAction(true);
                     }
                 }
+            }
+
+            updateAction(allowImmediate: boolean) {
+                action.set(null);
+                this.map.getTileLayerNames().forEach((layerName) => {
+                    const tile = this.layers[layerName].getTileAtWorldXY(this.avatar.x * 48 + 24, this.avatar.y * 48 + 24);
+                    const layer = this.map.getLayer(layerName);
+                    if (tile && layer && this.layerProperties[layerName] && this.layerProperties[layerName].action) {
+                        const properties = this.layerProperties[layerName];
+                        if (properties.immediate && allowImmediate) {
+                            if (properties.action === 'switchRoom') {
+                                if (properties.targetLayer) {
+                                    navTargetLayer = properties.targetLayer;
+                                } else {
+                                    navTargetLayer = null;
+                                }
+                                navigate('/room/' + properties.roomSlug);
+                            }
+                        } else {
+                            action.set(properties);
+                        }
+                    }
+                });
             }
 
             updatePlayerLocation(data) {
