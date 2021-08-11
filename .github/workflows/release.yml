@@ -83,9 +83,9 @@ jobs:
         zip -r scr_frontend.zip ./frontend
 
     - name: Add Packages to Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            scr_frontend.tar.bz2
-            scr_frontend.zip
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          scr_frontend.tar.bz2
+          scr_frontend.zip
