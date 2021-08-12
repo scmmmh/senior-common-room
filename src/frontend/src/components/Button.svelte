@@ -24,4 +24,4 @@
     const dispatch = createEventDispatcher();
 </script>
 
-<button on:click={(ev) => { dispatch('click', ev); }} class="inline-block {typeCls} {cls}" title={title}><slot></slot></button>
+<button on:click={(ev) => { dispatch('click', ev); }} class="inline-block {typeCls} {cls}" title={title} aria-label={$$props['aria-label']}><slot></slot></button>
