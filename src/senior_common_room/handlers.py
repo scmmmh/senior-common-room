@@ -62,6 +62,10 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.receive_user_message(json.loads(message.payload.decode()))
                 elif message.topic == f'user/{self.user.id}/request-video-chat':
                     await self.receive_request_video_chat_message(json.loads(message.payload.decode()))
+                elif self.jitsi_room_name and message.topic == f'jitsi-rooms/{self.jitsi_room_name}/user-list':
+                    await self.jitsi_room_user_list(json.loads(message.payload.decode()))
+                elif self.jitsi_room_name and message.topic == f'user/{self.user.id}/leave_jitsi_room':
+                    await self.leave_jitsi_room()
                 else:
                     logger.debug(message.topic)
 
@@ -82,7 +86,9 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                 elif message['type'] == 'enter-jitsi-room' and 'jitsi' in self.config:
                     await self.request_jitsi_room(message)
                 elif message['type'] == 'leave-jitsi-room' and 'jitsi' in self.config:
-                    await self.leave_jitsi_room(message)
+                    await self.leave_jitsi_room()
+                elif message['type'] == 'get-jitsi-room-users' and 'jitsi' in self.config:
+                    await self.request_jitsi_room_users()
                 elif message['type'] == 'enter-room':
                     await self.enter_room(message)
                 elif message['type'] == 'set-avatar-location':
@@ -111,6 +117,12 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
 
     async def send_message(self, msg):
         await self.write_message(json.dumps(msg))
+
+    async def send_mqtt_message(self, topic, msg=None):
+        if msg:
+            await self.mqtt.publish(topic, payload=json.dumps(msg).encode())
+        else:
+            await self.mqtt.publish(topic)
 
     def check_origin(self, *args, **kwargs):
         # TODO: Enable only in dev mode

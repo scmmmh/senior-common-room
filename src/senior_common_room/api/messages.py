@@ -79,7 +79,7 @@ class MessagesMixin():
             })
 
     async def send_accept_video_chat_message(self, message):
-        await self.mqtt.publish(f'jitsi-rooms/random/enter',
+        await self.mqtt.publish(f'jitsi-rooms/_private/enter',
                                 payload=json.dumps({
                                     'users': [self.user.id, message['payload']['user']['id']]
                                 }))

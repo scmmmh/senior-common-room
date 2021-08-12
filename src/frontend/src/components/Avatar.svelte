@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
     import { slide } from 'svelte/transition';
 
-    import { sendMessage, user } from '../store';
+    import { sendMessage, user, jitsiRoomUsers } from '../store';
     import SendMessage from './SendMessage.svelte';
     import Button from './Button.svelte';
 
@@ -67,7 +67,7 @@
                         </svg>
                     </Button>
                 </li>
-                {#if distance < 3}
+                {#if distance < 3 && $jitsiRoomUsers.indexOf(avatar.user.id) < 0}
                     <li class="flex-0">
                         <Button type="icon" class="block" aria-label="Start a video chat" title="Start a video chat" on:click={requestVideoChat}>
                             <svg viewBox="0 0 24 24" class="w-6 h-6">

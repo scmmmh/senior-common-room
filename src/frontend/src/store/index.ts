@@ -4,6 +4,7 @@ import { rooms, badges } from './config';
 import { action, actionLabel, executeAction } from './action';
 import { overlay } from './overlay';
 import { user, isOnboarded, isOnboarding } from './user';
+import { jitsiRoomUsers } from './jitsi';
 
 export {
     connect,
@@ -35,4 +36,6 @@ export {
     actionLabel,
 
     overlay,
+
+    jitsiRoomUsers,
 };

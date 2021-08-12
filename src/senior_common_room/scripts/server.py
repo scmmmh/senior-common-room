@@ -26,7 +26,7 @@ async def jitsi_room_state_server(config):
                 async for message in messages:
                     payload = json.loads(message.payload.decode())
                     room_name = message.topic.split('/')[1]
-                    if room_name == 'random':
+                    if room_name == '_private':
                         room_name = token_hex(32)
                         while room_name in jitsi_rooms:
                             room_name = token_hex(32)
@@ -44,6 +44,7 @@ async def jitsi_room_state_server(config):
                                                      'password': jitsi_rooms[room_name]['password'],
                                                      'subject': jitsi_rooms[room_name]['subject']
                                                  }).encode())
+                        await client.publish(f'jitsi-rooms/{room_name}/request-user-list')
                     else:
                         if room_name not in jitsi_rooms:
                             jitsi_rooms[room_name] = {
@@ -62,6 +63,7 @@ async def jitsi_room_state_server(config):
                                                  'password': jitsi_rooms[room_name]['password'],
                                                  'subject': jitsi_rooms[room_name]['subject']
                                              }).encode())
+                        await client.publish(f'jitsi-rooms/{room_name}/request-user-list')
 
         async def leave_handler():
             async with client.filtered_messages("jitsi-rooms/+/leave") as messages:
@@ -74,10 +76,20 @@ async def jitsi_room_state_server(config):
                             jitsi_rooms[room_name]['users'].remove(payload['user'])
                             logger.debug(f'User {payload["user"]} leaving {room_name}')
                             await client.publish(f'user/{payload["user"]}/leave_jitsi_room')
+                            await client.publish(f'jitsi-rooms/{room_name}/request-user-list')
                         if len(jitsi_rooms[room_name]['users']) == 0:
                             del jitsi_rooms[room_name]
 
-        await asyncio.gather(enter_handler(), leave_handler())
+        async def request_user_list_handler():
+            async with client.filtered_messages("jitsi-rooms/+/request-user-list") as messages:
+                await client.subscribe("jitsi-rooms/+/request-user-list")
+                async for message in messages:
+                    room_name = message.topic.split('/')[1]
+                    if room_name in jitsi_rooms:
+                        await client.publish(f'jitsi-rooms/{room_name}/user-list',
+                                             payload=json.dumps({'users': jitsi_rooms[room_name]['users']}).encode())
+
+        await asyncio.gather(enter_handler(), leave_handler(), request_user_list_handler())
 
 
 @click.command()

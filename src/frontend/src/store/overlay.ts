@@ -35,6 +35,6 @@ messages.subscribe((message) => {
             url: (message.payload as OpenJitsiRoomPayload).url,
             password: (message.payload as OpenJitsiRoomPayload).password,
             jwt: (message.payload as OpenJitsiRoomPayload).jwt,
-        })
+        });
     }
 })
