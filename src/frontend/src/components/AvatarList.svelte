@@ -8,7 +8,7 @@
     let visible = false;
 </script>
 
-<div class="fixed left-0 top-0 h-screen pt-20 pb-4 z-40">
+<div class="fixed left-0 top-0 h-screen mt-20 pb-4 z-40">
     <div class="bg-gray-700 text-white rounded-r-lg py-4 pl-2 pr-4 max-h-full flex flex-col">
         <h2 class="sr-only">People in the room</h2>
         <div class="flex-0 text-right {visible ? 'mb-4' : ''}">
