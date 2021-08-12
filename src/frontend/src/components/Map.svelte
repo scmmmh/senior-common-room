@@ -120,6 +120,15 @@
             this.move(location.x, location.y);
         }
 
+        bringToTop() {
+            this.scene.children.bringToTop(this.face);
+            this.scene.children.bringToTop(this.text);
+            this.scene.children.bringToTop(this.outline);
+            this.badges.forEach(([offsetX, offsetY, badge]) => {
+                this.scene.children.bringToTop(badge);
+            });
+        }
+
         destroy() {
             this.face.destroy();
             this.text.destroy();
@@ -185,6 +194,7 @@
                 });
                 this.avatar.create();
                 this.avatar.follow();
+                this.avatar.bringToTop();
                 this.updatePlayerLocation(data);
                 this.updateAction(false);
 
@@ -310,6 +320,7 @@
                         if (this.avatars[data.user.id]) {
                             this.avatars[data.user.id].create();
                             this.avatars[data.user.id].move(data.x, data.y);
+                            this.avatar.bringToTop();
                         }
                     });
                     this.load.start();
