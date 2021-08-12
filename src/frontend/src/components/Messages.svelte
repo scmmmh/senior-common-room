@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
+    import { derived } from 'svelte/store';
 
-    import { messages, user, sendMessage } from '../store';
+    import { messages, sendMessage, overlay } from '../store';
     import Message from './Message.svelte';
     import Button from './Button.svelte';
     import SendMessage from './SendMessage.svelte';
@@ -9,6 +10,17 @@
     let currentMessages = [];
     let nextMessageId = 1;
     let showUserMessage = false;
+
+    const jitsiRoom = derived(overlay, (overlay) => {
+        if (overlay && overlay.type === 'jitsi-room') {
+            console.log(overlay);
+            return {
+                name: overlay.name,
+            };
+        } else {
+            return null;
+        }
+    }, null);
 
     const unsubscribeMessages = messages.subscribe((message) => {
         if (message.type === 'broadcast-message') {
@@ -37,7 +49,8 @@
                 id: nextMessageId,
                 payload: {
                     type: 'video-chat-invite',
-                    user: (message.payload as RequestVideoChatPayload).user
+                    user: (message.payload as RequestVideoChatPayload).user,
+                    room: (message.payload as RequestVideoChatPayload).room
                 }
             });
             currentMessages = currentMessages;
@@ -67,13 +80,30 @@
         }
     }
 
-    function acceptVideoChatInvite(user) {
-        sendMessage({
-            type: 'accept-video-chat-message',
-            payload: {
-                user: user
-            }
-        })
+    function acceptVideoChatInvite(user, room) {
+        if (room) {
+            sendMessage({
+                type: 'enter-jitsi-room',
+                payload: {
+                    name: room,
+                    subject: 'Private chat',
+                }
+            });
+        } else if ($jitsiRoom) {
+            sendMessage({
+                type: 'accept-video-chat-message',
+                payload: {
+                    user: user
+                }
+            });
+        } else {
+            sendMessage({
+                type: 'accept-video-chat-message',
+                payload: {
+                    user: user
+                }
+            });
+        }
     }
 
     onDestroy(unsubscribeMessages);
@@ -114,10 +144,10 @@
                             <img src="{msg.payload.user.avatar}-small.png" alt="" class="w-6 h-6 flex-0"/>
                             <span class="flex-1 tracking-wider px-2">Video Chat Invitation</span>
                         </div>
-                        <p class="mb-2">{msg.payload.user.name} would like to chat with you.</p>
+                        <p class="mb-2">{msg.payload.user.name} {#if msg.payload.room}would like to invite you to join a chat{:else if $jitsiRoom}would like to join your chat{:else}would like to chat with you{/if}.</p>
                         <div class="text-right">
-                            <Button on:click={() => { acceptVideoChatInvite(msg.payload.user); closeMessage(msg.id); }} type="primary-outline">
-                                Let's chat!
+                            <Button on:click={() => { acceptVideoChatInvite(msg.payload.user, msg.payload.room); closeMessage(msg.id); }} type="primary-outline">
+                                {#if $jitsiRoom}Join us!{:else}Let's chat!{/if}
                             </Button>
                             <Button on:click={() => { closeMessage(msg.id); }} type="primary-outline">
                                 Not now, sorry.

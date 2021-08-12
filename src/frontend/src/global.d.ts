@@ -38,7 +38,7 @@ interface EnterJitsiRoomPayload {
 }
 
 interface OpenJitsiRoomPayload {
-    name: string;
+    room_name: string;
     subject: string;
     url: string;
     password: string;
@@ -96,6 +96,7 @@ interface UserPartialPayload {
 
 interface RequestVideoChatPayload {
     user: UserPartialPayload;
+    room?: string;
 }
 
 interface JitsiRoomUsersPayload {

@@ -28,9 +28,10 @@ messages.subscribe((message) => {
     if (message.type === 'authentication-required') {
         overlay.set(null);
     } else if (message.type === 'open-jitsi-room') {
+        console.log(message);
         overlay.set({
             type: 'jitsi-room',
-            name: (message.payload as OpenJitsiRoomPayload).name,
+            name: (message.payload as OpenJitsiRoomPayload).room_name,
             subject: (message.payload as OpenJitsiRoomPayload).subject,
             url: (message.payload as OpenJitsiRoomPayload).url,
             password: (message.payload as OpenJitsiRoomPayload).password,

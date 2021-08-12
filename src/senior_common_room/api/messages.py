@@ -69,20 +69,44 @@ class MessagesMixin():
                                     }
                                 }))
 
+    async def send_request_join_video_chat_message(self, message):
+        await self.mqtt.publish(f'user/{message["payload"]["user"]["id"]}/request-video-chat',
+                                payload=json.dumps({
+                                    'user': {
+                                        'id': self.user.id,
+                                        'name': self.user.name,
+                                        'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}'
+                                    },
+                                    'room': message['payload']['room']
+                                }))
+
     async def receive_request_video_chat_message(self, message):
         if not self.user.blocked_users or message['user']['id'] not in self.user.blocked_users:
-            await self.send_message({
-                'type': 'request-video-chat',
-                'payload': {
-                    'user': message['user']
-                }
-            })
+            if 'room' in message:
+                await self.send_message({
+                    'type': 'request-video-chat',
+                    'payload': {
+                        'user': message['user'],
+                        'room': message['room']
+                    }
+                })
+            else:
+                await self.send_message({
+                    'type': 'request-video-chat',
+                    'payload': {
+                        'user': message['user']
+                    }
+                })
 
     async def send_accept_video_chat_message(self, message):
-        await self.mqtt.publish(f'jitsi-rooms/_private/enter',
-                                payload=json.dumps({
-                                    'users': [self.user.id, message['payload']['user']['id']]
-                                }))
+        if self.jitsi_room_name:
+            await self.send_mqtt_message(f'jitsi-rooms/{self.jitsi_room_name}/enter',
+                                         {'user': message['payload']['user']['id']})
+        else:
+            await self.mqtt.publish(f'jitsi-rooms/_private/enter',
+                                    payload=json.dumps({
+                                        'users': [self.user.id, message['payload']['user']['id']]
+                                    }))
 
     def teardown_messages_task(self):
         if self.broadcast_messages_mqtt_task:
