@@ -97,6 +97,10 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.send_request_video_chat_message(message)
                 elif message['type'] == 'accept-video-chat-message':
                     await self.send_accept_video_chat_message(message)
+                elif message['type'] == 'block-user':
+                    await self.block_user(message)
+                elif message['type'] == 'unblock-user':
+                    await self.unblock_user(message)
                 else:
                     logger.debug(data)
             else:

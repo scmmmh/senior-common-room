@@ -14,3 +14,4 @@ class User(Base):
     token = Column(String(length=255))
     avatar = Column(String(length=255), unique=True)
     roles = Column(NestedMutableJson)
+    blocked_users = Column(NestedMutableJson)

@@ -50,13 +50,14 @@ class MessagesMixin():
                                 }))
 
     async def receive_user_message(self, message):
-        await self.send_message({
-            'type': 'user-message',
-            'payload': {
-                'user': message['user'],
-                'message': message['message']
-            }
-        })
+        if not self.user.blocked_users or message['user']['id'] not in self.user.blocked_users:
+            await self.send_message({
+                'type': 'user-message',
+                'payload': {
+                    'user': message['user'],
+                    'message': message['message']
+                }
+            })
 
     async def send_request_video_chat_message(self, message):
         await self.mqtt.publish(f'user/{message["payload"]["user"]["id"]}/request-video-chat',
@@ -69,12 +70,13 @@ class MessagesMixin():
                                 }))
 
     async def receive_request_video_chat_message(self, message):
-        await self.send_message({
-            'type': 'request-video-chat',
-            'payload': {
-                'user': message['user']
-            }
-        })
+        if not self.user.blocked_users or message['user']['id'] not in self.user.blocked_users:
+            await self.send_message({
+                'type': 'request-video-chat',
+                'payload': {
+                    'user': message['user']
+                }
+            })
 
     async def send_accept_video_chat_message(self, message):
         await self.mqtt.publish(f'jitsi-rooms/random/enter',

@@ -29,6 +29,7 @@ interface UserPayload {
     email: string;
     avatar: string;
     roles: string[];
+    blocked_users: number[];
 }
 
 interface EnterJitsiRoomPayload {

@@ -37,7 +37,7 @@ class UserMixin():
                             'payload': {
                                 'email': message['payload']['email'],
                                 'remember': message['payload']['remember'],
-                                'token': message['payload']['token']
+                                'token': message['payload']['token'],
                             }
                         })
                         self.user_mqtt_task = asyncio.create_task(self.on_mqtt_messages(f'user/{self.user.id}/+'))
@@ -105,6 +105,7 @@ This e-mail is automatically generated. Please do not reply to it.
                     'email': self.user.email,
                     'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}',
                     'roles': self.user.roles,
+                    'blocked_users': self.user.blocked_users,
                 }
             })
 
@@ -157,3 +158,21 @@ This e-mail is automatically generated. Please do not reply to it.
         await self.send_message({
             'type': 'avatar-image-update-failed'
         })
+
+    async def block_user(self, message):
+        async with self.sessionmaker() as session:
+            session.add(self.user)
+            if self.user.blocked_users is None:
+                self.user.blocked_users = [message['payload']['user']['id']]
+            elif message['payload']['user']['id'] not in self.user.blocked_users:
+                self.user.blocked_users.append(message['payload']['user']['id'])
+            await session.commit()
+        await self.get_user(None)
+
+    async def unblock_user(self, message):
+        async with self.sessionmaker() as session:
+            session.add(self.user)
+            if self.user.blocked_users and message['payload']['user']['id'] in self.user.blocked_users:
+                self.user.blocked_users.remove(message['payload']['user']['id'])
+            await session.commit()
+        await self.get_user(None)
