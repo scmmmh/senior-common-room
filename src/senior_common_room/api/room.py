@@ -60,3 +60,7 @@ class RoomMixin():
             self.room_mqtt_task.cancel()
             self.room_mqtt_task = None
         self.room_name = None
+
+    async def teardown_room(self):
+        if self.room_name:
+            await self.leave_room(None)

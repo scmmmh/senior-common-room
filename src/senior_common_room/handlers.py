@@ -42,6 +42,7 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
         if self.room_mqtt_task:
             self.room_mqtt_task.cancel()
         self.teardown_messages_task()
+        IOLoop.current().add_callback(self.teardown_room)
         IOLoop.current().add_callback(self.mqtt.disconnect)
 
     async def on_mqtt_messages(self, topic):

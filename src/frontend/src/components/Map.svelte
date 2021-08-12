@@ -124,6 +124,9 @@
             this.face.destroy();
             this.text.destroy();
             this.outline.destroy();
+            this.badges.forEach(([offsetX, offsetY, badge]) => {
+                badge.destroy();
+            });
         }
     }
 
