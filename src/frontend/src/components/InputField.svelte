@@ -30,14 +30,14 @@
     </label>
 {:else if type === 'textarea'}
     <label class="block mb-4"><slot></slot>
-        <textarea on:change={changeValue} on:keydown={stopPropagation} on:keyup={stopPropagation} class="border-1 border-gray-200 px-2 py-2 w-full h-40 focus:shadow-inner whitespace-pre-wrap">{value}</textarea>
+        <textarea on:change={changeValue} on:keydown={stopPropagation} on:keyup={stopPropagation} class="border-1 border-gray-200 text-black px-2 py-2 w-full h-40 focus:shadow-inner whitespace-pre-wrap">{value}</textarea>
         {#if error !== ''}
             <span class="block pt-1 text-red-600 text-sm">{error}</span>
         {/if}
     </label>
 {:else}
     <label class="block mb-4">
-        <span class="block uppercase tracking-wider text-sm pb-1"><slot></slot></span><input type={type} value={value} on:change={changeValue} class="block border-1 border-gray-200 px-2 py-2 w-full focus:shadow-inner"/>
+        <span class="block uppercase tracking-wider text-sm pb-1"><slot></slot></span><input type={type} value={value} on:change={changeValue} class="block border-1 border-gray-200 text-black px-2 py-2 w-full focus:shadow-inner"/>
         {#if error !== ''}
             <span class="block pt-1 text-red-600 text-sm">{error}</span>
         {/if}

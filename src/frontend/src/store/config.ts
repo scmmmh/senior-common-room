@@ -19,11 +19,15 @@ messages.subscribe((message) => {
         const pathElements = window.location.pathname.split('/');
         let redirect = true;
         if (pathElements.length > 0) {
-            (message.payload as RoomConfigPayload[]).forEach((room) => {
-                if (room.slug == pathElements[pathElements.length - 1]) {
-                    redirect = false;
-                }
-            });
+            if (pathElements[pathElements.length - 1] === 'profile') {
+                redirect = false;
+            } else {
+                (message.payload as RoomConfigPayload[]).forEach((room) => {
+                    if (room.slug == pathElements[pathElements.length - 1]) {
+                        redirect = false;
+                    }
+                });
+            }
         }
         rooms.set(message.payload as RoomConfigPayload[]);
         if (redirect && (message.payload as RoomConfigPayload[]).length > 0) {

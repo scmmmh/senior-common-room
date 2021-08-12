@@ -81,6 +81,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.get_badges_config(message)
                 elif message['type'] == 'get-user':
                     await self.get_user(message)
+                elif message['type'] == 'update-user-profile':
+                    await self.update_user_profile(message)
                 elif message['type'] == 'update-avatar-image':
                     await self.update_avatar_image(message)
                 elif message['type'] == 'enter-jitsi-room' and 'jitsi' in self.config:

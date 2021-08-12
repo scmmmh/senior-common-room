@@ -5,6 +5,7 @@ import MainNav from './components/MainNav.svelte';
 import ConnectionStatus from './components/ConnectionStatus.svelte';
 import Authentication from './components/Authentication.svelte';
 import Room from './routes/Room.svelte';
+import Profile from './routes/Profile.svelte';
 import Overlay from './components/Overlay.svelte';
 import Onboarding from './components/Onboarding.svelte';
 import Admin from './components/Admin.svelte';
@@ -23,6 +24,7 @@ connect();
 					<MainNav/>
 					<div class="flex-1 overflow-hidden">
 						<Route path='/room/:rid' let:params><Room rid={params.rid}/></Route>
+						<Route path='/profile'><Profile/></Route>
 					</div>
 					<Messages/>
 					<Overlay/>

@@ -11,7 +11,7 @@
     if (type === 'primary') {
         typeCls = 'px-3 py-2 font-medium bg-yellow-400 text-black';
     } else if (type === 'secondary') {
-        typeCls = 'px-3 py-2 bg-gray-300';
+        typeCls = 'px-3 py-2 bg-gray-300 text-black';
     } else if (type === 'primary-outline') {
         typeCls = 'px-3 py-2 border-2 border-yellow-400';
     } else if (type === 'icon') {

@@ -109,6 +109,16 @@ This e-mail is automatically generated. Please do not reply to it.
                 }
             })
 
+    async def update_user_profile(self, message):
+        async with self.sessionmaker() as session:
+            session.add(self.user)
+            if 'name' in message['payload']:
+                self.user.name = message['payload']['name']
+            if 'email' in message['payload']:
+                self.user.email = message['payload']['email']
+            await session.commit()
+        await self.get_user(None)
+
     async def update_avatar_image(self, message):
         logger.debug('Updating the avatar image')
         if message['payload']['imageData'].startswith('data:'):
