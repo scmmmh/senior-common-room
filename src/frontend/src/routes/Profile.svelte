@@ -180,7 +180,7 @@
                 {#if $editableBadges.length > 0}
                     <span class="block uppercase tracking-wider text-sm pb-1">Badges</span>
                     {#each $editableBadges as badge}
-                        <InputField type="checkbox" bind:value={selectedBadges[badge.role]}>{badge.title}</InputField>
+                        <InputField type="checkbox" bind:value={selectedBadges[badge.role]}><img src={badge.url} alt="" class="inline"/> {badge.title}</InputField>
                     {/each}
                 {/if}
                 <div class="pt-4 text-right">

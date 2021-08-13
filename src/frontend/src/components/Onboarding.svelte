@@ -267,7 +267,7 @@
                 <div slot="content">
                     <p class="mb-4">If you want to, you can indicate certain things about you by selecting from the badges listed below. This is completely optional and if you don't want to badge yourself, then simply don't select any badges. You can always change these later from your profile page.</p>
                     {#each $editableBadges as badge}
-                        <InputField type="checkbox" bind:value={badgeSelection[badge.role]}>{badge.title}</InputField>
+                        <InputField type="checkbox" bind:value={badgeSelection[badge.role]}><img src={badge.url} alt="" class="inline"/> {badge.title}</InputField>
                     {/each}
                 </div>
                 <div slot="actions" class="flex">

@@ -59,9 +59,11 @@
             this.text.setStroke('#fff', 3);
             this.text.setShadow(2, 2, "#333333", 2, true, true);
             this.text.setOrigin(0.5, 0);
+            this.text.setDepth(1);
             this.outline = this.scene.add.graphics();
             this.outline.lineStyle(2, '0x374151', 1);
             this.outline.strokeCircle(0, 0, 24);
+            this.outline.setDepth(1);
             this.outline.x = this.face.x;
             this.outline.y = this.face.y;
             this.badges = [];
@@ -73,22 +75,24 @@
                         let offsetX = 0;
                         let offsetY = 0;
                         if (idx === 0) {
-                            offsetX = -24;
-                            offsetY = 24;
+                            offsetX = 20;
+                            offsetY = 20;
                         } else if (idx === 1) {
-                            offsetX = 24;
-                            offsetY = 24;
+                            offsetX = -20;
+                            offsetY = 20;
                         } else if (idx === 2) {
-                            offsetX = -24;
-                            offsetY = -24;
+                            offsetX = -20;
+                            offsetY = -20;
                         } else if (idx === 3) {
-                            offsetX = 24;
-                            offsetY = -24;
+                            offsetX = 20;
+                            offsetY = -20;
                         }
-                        this.badges.push([offsetX, offsetY, this.scene.add.image(this.face.x + offsetX, this.face.y + offsetY, 'badge.' + role)]);
+                        const badgeSprite = this.scene.add.image(this.face.x + offsetX, this.face.y + offsetY, 'badge.' + role);
+                        badgeSprite.setDepth(1);
+                        this.badges.push([offsetX, offsetY, badgeSprite]);
                     }
                 }
-           });
+            });
         }
 
         follow() {
