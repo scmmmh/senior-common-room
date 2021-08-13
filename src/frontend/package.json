@@ -2,6 +2,7 @@
   "name": "senior-common-room",
   "version": "0.1.8",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
