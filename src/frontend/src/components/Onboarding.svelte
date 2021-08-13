@@ -1,16 +1,18 @@
 <script type="ts">
     import { tick, onDestroy } from 'svelte';
-    import { writable } from 'svelte/store';
+    import { writable, derived } from 'svelte/store';
 
-    import { messages, sendMessage, isOnboarding } from '../store';
+    import { messages, badges, sendMessage, isOnboarding } from '../store';
     import Dialog from './Dialog.svelte';
     import Button from './Button.svelte';
+    import InputField from './InputField.svelte';
 
     const WELCOME = 0;
     const AVATAR = 1;
     const AVATAR_PHOTO = 2;
     const AVATAR_UPLOAD = 3;
-    const COMPLETE = 4;
+    const BADGES = 4;
+    const COMPLETE = 5;
 
     const step = writable(WELCOME);
     let videoWrapperElement = null as HTMLElement;
@@ -21,6 +23,17 @@
     let fileUploadElement = null as HTMLInputElement;
     let uploading = false;
     let uploadFailed = false;
+    let badgeSelection = Object.fromEntries($badges.map((badge) => {
+        if (badge.self_assigned) {
+            return [badge.role, false];
+        } else {
+            return null;
+        }
+    }).filter((value) => { return value !== null; }));
+
+    const editableBadges = derived(badges, (badges) => {
+        return badges.filter((badge) => { return badge.self_assigned; });
+    }, []);
 
     const unsubscribeStep = step.subscribe((step) => {
         if (step === AVATAR_PHOTO) {
@@ -43,7 +56,11 @@
     const unsubscribeMessages = messages.subscribe((message) => {
         if (message.type === 'avatar-image-updated') {
             uploading = false;
-            step.set(COMPLETE);
+            if ($editableBadges.length > 0) {
+                step.set(BADGES);
+            } else {
+                step.set(COMPLETE);
+            }
         } else if (message.type === 'avatar-image-update-failed') {
             uploading = false;
             uploadFailed = true;
@@ -94,6 +111,24 @@
 
         fileUploadElement.addEventListener('change', uploadFileChanged);
         fileUploadElement.click();
+    }
+
+    function setBadges(ev: Event) {
+        ev.preventDefault();
+        const roles = Object.entries(badgeSelection).map(([role, selected]) => {
+            if (selected) {
+                return role;
+            } else {
+                return null;
+            }
+        }).filter((role) => { return role !== null; });
+        sendMessage({
+            'type': 'update-user-profile',
+            'payload': {
+                'roles': roles,
+            }
+        });
+        step.set(COMPLETE);
     }
 
     function enter() {
@@ -224,6 +259,21 @@
                             {/if}
                         </Button>
                     {/if}
+                </div>
+            </Dialog>
+        {:else if $step === BADGES}
+            <Dialog class="bg-white">
+                <span slot="title">Give yourself some badges</span>
+                <div slot="content">
+                    <p class="mb-4">If you want to, you can indicate certain things about you by selecting from the badges listed below. This is completely optional and if you don't want to badge yourself, then simply don't select any badges. You can always change these later from your profile page.</p>
+                    {#each $editableBadges as badge}
+                        <InputField type="checkbox" bind:value={badgeSelection[badge.role]}>{badge.title}</InputField>
+                    {/each}
+                </div>
+                <div slot="actions" class="flex">
+                    <Button on:click={() => { step.set(COMPLETE); }} type="secondary" class="flex-0">No badges, thank you</Button>
+                    <div class="flex-1"></div>
+                    <Button on:click={setBadges} type="primary" class="flex-0">Set badges</Button>
                 </div>
             </Dialog>
         {:else if $step === COMPLETE}
