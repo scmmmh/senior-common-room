@@ -134,7 +134,10 @@ This e-mail is automatically generated. Please do not reply to it.
             if filetype in ['image/png', 'image/jpeg']:
                 if b64data.startswith('base64,'):
                     b64data = b64data[7:]
-                logger.debug(filetype)
+                if os.path.exists(os.path.join(self.config['storage']['avatars'], f'{self.user.avatar}-large.png')):
+                    os.unlink(os.path.join(self.config['storage']['avatars'], f'{self.user.avatar}-large.png'))
+                if os.path.exists(os.path.join(self.config['storage']['avatars'], f'{self.user.avatar}-small.png')):
+                    os.unlink(os.path.join(self.config['storage']['avatars'], f'{self.user.avatar}-small.png'))
                 buffer = BytesIO(b64decode(b64data))
                 if filetype == 'image/png':
                     format = 'PNG'
