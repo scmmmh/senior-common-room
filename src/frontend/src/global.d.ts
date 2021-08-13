@@ -77,6 +77,7 @@ interface BadgeConfigPayload {
     title: string;
     url: string;
     role: string;
+    self_assigned: boolean;
 }
 
 interface BroadcastMessagePayload {
@@ -106,4 +107,5 @@ interface JitsiRoomUsersPayload {
 interface UpdateProfilePlayload {
     name?: string;
     email?: string;
+    roles?: string[];
 }

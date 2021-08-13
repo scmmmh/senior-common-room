@@ -112,6 +112,11 @@ CONFIG_SCHEMA = {
                     'type': 'string',
                     'required': True,
                     'empty': False,
+                },
+                'self_assigned': {
+                    'type': 'boolean',
+                    'required': False,
+                    'default': False,
                 }
             }
         }

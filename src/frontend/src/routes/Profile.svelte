@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onDestroy, tick } from 'svelte';
-    import { writable } from 'svelte/store';
+    import { writable, derived } from 'svelte/store';
 
-    import { user, sendMessage, messages } from '../store';
+    import { user, sendMessage, messages, badges } from '../store';
     import InputField from '../components/InputField.svelte';
     import Button from '../components/Button.svelte';
     import Dialog from '../components/Dialog.svelte';
@@ -10,7 +10,6 @@
     const AVATAR = 1;
     const AVATAR_PHOTO = 2;
     const AVATAR_UPLOAD = 3;
-    const COMPLETE = 4;
 
     const step = writable(AVATAR);
     let videoWrapperElement = null as HTMLElement;
@@ -23,27 +22,54 @@
     let uploadFailed = false;
     let name = $user.name;
     let email = $user.email;
+    let selectedBadges = Object.fromEntries($badges.map((badge) => {
+        if (badge.self_assigned) {
+            return [badge.role, $user.roles.indexOf(badge.role) >= 0];
+        } else {
+            return null;
+        }
+    }).filter((value) => { return value !== null; }));
     let updateSentTimeout = null;
     let updateAvatar = false;
 
     function updateProfile(ev: Event) {
         ev.preventDefault();
-        updateSentTimeout = window.setTimeout(() => {
-            updateSentTimeout = null;
-        }, 5000);
+        let roles = $user.roles;
+        Object.entries(selectedBadges).forEach(([role, selected]) => {
+            if (selected) {
+                if (roles.indexOf(role) < 0) {
+                    roles.push(role);
+                }
+            } else {
+                if (roles.indexOf(role) >= 0) {
+                    roles = roles.splice(roles.indexOf(role), 1);
+                }
+            }
+        });
         sendMessage({
             'type': 'update-user-profile',
             'payload': {
                 'name': name,
                 'email': email,
+                'roles': roles,
             }
         });
+        updateSentTimeout = window.setTimeout(() => {
+            updateSentTimeout = null;
+        }, 5000);
     }
 
     function dontUpdateProfile(ev: Event) {
         ev.preventDefault();
         name = $user.name;
         email = $user.email;
+        selectedBadges = Object.fromEntries($badges.map((badge) => {
+            if (badge.self_assigned) {
+                return [badge.role, $user.roles.indexOf(badge.role) >= 0];
+            } else {
+                return null;
+            }
+        }).filter((value) => { return value !== null; }));
     }
 
     const unsubscribeStep = step.subscribe((step) => {
@@ -124,6 +150,10 @@
         fileUploadElement.click();
     }
 
+    const editableBadges = derived(badges, (badges) => {
+        return badges.filter((badge) => { return badge.self_assigned; });
+    }, []);
+
     onDestroy(() => {
         unsubscribeStep();
         unsubscribeMessages();
@@ -147,6 +177,12 @@
             <form class="flex-1 pl-10 max-w-lg" on:submit={updateProfile}>
                 <InputField type="text" bind:value={name}>Name</InputField>
                 <InputField type="text" bind:value={email}>E-Mail Address</InputField>
+                {#if $editableBadges.length > 0}
+                    <span class="block uppercase tracking-wider text-sm pb-1">Badges</span>
+                    {#each $editableBadges as badge}
+                        <InputField type="checkbox" bind:value={selectedBadges[badge.role]}>{badge.title}</InputField>
+                    {/each}
+                {/if}
                 <div class="pt-4 text-right">
                     <Button type="secondary" on:click={dontUpdateProfile}>Don't Update</Button>
                     <Button type="primary">

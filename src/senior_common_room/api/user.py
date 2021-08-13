@@ -116,6 +116,13 @@ This e-mail is automatically generated. Please do not reply to it.
                 self.user.name = message['payload']['name']
             if 'email' in message['payload']:
                 self.user.email = message['payload']['email']
+            if 'roles' in message['payload']:
+                new_roles = []
+                if 'admin' in self.user.roles:
+                    new_roles.append('admin')
+                new_roles.extend([role for role in message['payload']['roles']
+                                  if role != 'admin'])
+                self.user.roles = new_roles
             await session.commit()
         await self.get_user(None)
 
