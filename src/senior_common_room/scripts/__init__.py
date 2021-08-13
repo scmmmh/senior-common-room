@@ -93,6 +93,8 @@ CONFIG_SCHEMA = {
     },
     'badges': {
         'type': 'list',
+        'required': False,
+        'default': [],
         'schema': {
             'type': 'dict',
             'schema': {

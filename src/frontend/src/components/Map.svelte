@@ -65,24 +65,28 @@
             this.outline.x = this.face.x;
             this.outline.y = this.face.y;
             this.badges = [];
+            let badgeCount = 0;
             this.user.roles.forEach((role, idx) => {
-                if (idx < 4) {
-                    let offsetX = 0;
-                    let offsetY = 0;
-                    if (idx === 0) {
-                        offsetX = -24;
-                        offsetY = 24;
-                    } else if (idx === 1) {
-                        offsetX = 24;
-                        offsetY = 24;
-                    } else if (idx === 2) {
-                        offsetX = -24;
-                        offsetY = -24;
-                    } else if (idx === 3) {
-                        offsetX = 24;
-                        offsetY = -24;
+                if ($badges.filter((badge) => { return badge.role === role; }).length > 0) {
+                    if (badgeCount < 4) {
+                        badgeCount = badgeCount + 1;
+                        let offsetX = 0;
+                        let offsetY = 0;
+                        if (idx === 0) {
+                            offsetX = -24;
+                            offsetY = 24;
+                        } else if (idx === 1) {
+                            offsetX = 24;
+                            offsetY = 24;
+                        } else if (idx === 2) {
+                            offsetX = -24;
+                            offsetY = -24;
+                        } else if (idx === 3) {
+                            offsetX = 24;
+                            offsetY = -24;
+                        }
+                        this.badges.push([offsetX, offsetY, this.scene.add.image(this.face.x + offsetX, this.face.y + offsetY, 'badge.' + role)]);
                     }
-                    this.badges.push([offsetX, offsetY, this.scene.add.image(this.face.x + offsetX, this.face.y + offsetY, 'badge.' + role)]);
                 }
            });
         }
