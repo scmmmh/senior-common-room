@@ -42,7 +42,7 @@
                 }
             } else {
                 if (roles.indexOf(role) >= 0) {
-                    roles = roles.splice(roles.indexOf(role), 1);
+                    roles.splice(roles.indexOf(role), 1);
                 }
             }
         });
