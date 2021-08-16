@@ -9,7 +9,11 @@ module.exports = {
             },
             width: {
                 'dialog': '30rem',
+                'dialog-wide': '60rem',
             },
+            maxHeight: {
+                '9/10s': '90vh',
+            }
         },
       },
     variants: {

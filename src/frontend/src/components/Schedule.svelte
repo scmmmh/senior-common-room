@@ -47,12 +47,12 @@
 
 {#if $showSchedule}
     <Modal on:close={closeSchedule}>
-        <Dialog>
+        <Dialog class="md:w-dialog-wide">
             <div slot="title">Schedule</div>
             <div slot="content">
                 {#each $groupedEntries as days}
-                    <h2 class="text-xl tracking-wider mt-4 mb-2">{days[0].start_date}</h2>
-                    <table>
+                    <h3 class="text-xl tracking-wider mt-4 mb-2">{days[0].start_date}</h3>
+                    <table class="mb-8">
                         <thead>
                             <tr class="sr-only">
                                 <th class="py-2 px-3">Time</th>
@@ -62,8 +62,8 @@
                         <tbody>
                             {#each days as entry}
                                 <tr>
-                                    <td class="py-2 px-3 align-top">{entry.start_time} - {entry.end_time}{#if entry.day_diff !== 0}<span class="pl-1 text-xs">(+{entry.day_diff} day)</span>{/if}</td>
-                                    <td class="py-2 px-3 align-top">
+                                    <td class="py-2 px-3 align-top border-bottom-gray-500 border-b-1">{entry.start_time} - {entry.end_time}{#if entry.day_diff !== 0}<span class="pl-1 text-xs">(+{entry.day_diff} day)</span>{/if}</td>
+                                    <td class="py-2 px-3 align-top border-bottom-gray-500 border-b-1">
                                         <p class="font-bold tracking-widest">{entry.title}</p>
                                         {#if entry.room && $roomsDict[entry.room]}
                                             <p><Link to={'/room/' + $roomsDict[entry.room].slug} class="underline">{$roomsDict[entry.room].label}</Link></p>
