@@ -104,6 +104,7 @@ This e-mail is automatically generated. Please do not reply to it.
                     'name': self.user.name,
                     'email': self.user.email,
                     'avatar': f'{self.config["server"]["prefixes"]["avatars"]}/{self.user.avatar}',
+                    'timezone': self.user.timezone,
                     'roles': self.user.roles,
                     'blocked_users': self.user.blocked_users,
                 }
@@ -116,6 +117,8 @@ This e-mail is automatically generated. Please do not reply to it.
                 self.user.name = message['payload']['name']
             if 'email' in message['payload']:
                 self.user.email = message['payload']['email']
+            if 'timezone' in message['payload']:
+                self.user.timezone = message['payload']['timezone']
             if 'roles' in message['payload']:
                 new_roles = []
                 if 'admin' in self.user.roles:
@@ -125,6 +128,8 @@ This e-mail is automatically generated. Please do not reply to it.
                 self.user.roles = new_roles
             await session.commit()
         await self.get_user(None)
+        if 'timezone' in message['payload']:
+            await self.get_schedule_config()
 
     async def update_avatar_image(self, message):
         logger.debug('Updating the avatar image')

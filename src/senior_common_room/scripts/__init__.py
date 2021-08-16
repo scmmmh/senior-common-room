@@ -1,13 +1,23 @@
 import click
+import dateparser
 import logging.config
 import os
 import yaml
 
 from cerberus import Validator
+from pytz import timezone
 from typing import Union
 
 from .server import server
 from .database import database
+
+
+def parse_datetime(value: str):
+    utc = timezone('UTC')
+    return dateparser.parse(value, settings={
+        'TIMEZONE': 'UTC',
+        'RETURN_AS_TIMEZONE_AWARE': True
+    }).astimezone(utc)
 
 
 CONFIG_SCHEMA = {
@@ -193,6 +203,44 @@ CONFIG_SCHEMA = {
             'avatars': {
                 'type': 'string',
                 'required': True
+            }
+        }
+    },
+    'schedule': {
+        'type': 'list',
+        'default': [],
+        'schema': {
+            'type': 'dict',
+            'schema': {
+                'title': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'start': {
+                    'type': 'datetime',
+                    'required': True,
+                    'empty': False,
+                    'coerce': parse_datetime
+                },
+                'end': {
+                    'type': 'datetime',
+                    'required': True,
+                    'empty': False,
+                    'coerce': parse_datetime
+                },
+                'room': {
+                    'type': 'string',
+                    'required': False,
+                    'nullable': True,
+                    'default': None
+                },
+                'description': {
+                    'type': 'string',
+                    'required': False,
+                    'nullable': True,
+                    'default': None
+                }
             }
         }
     },

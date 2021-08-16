@@ -2,7 +2,7 @@
     import { tick, onDestroy } from 'svelte';
     import { writable, derived } from 'svelte/store';
 
-    import { messages, badges, sendMessage, isOnboarding } from '../store';
+    import { messages, badges, sendMessage, isOnboarding, timezones, onboardingCompleted } from '../store';
     import Dialog from './Dialog.svelte';
     import Button from './Button.svelte';
     import InputField from './InputField.svelte';
@@ -11,8 +11,9 @@
     const AVATAR = 1;
     const AVATAR_PHOTO = 2;
     const AVATAR_UPLOAD = 3;
-    const BADGES = 4;
-    const COMPLETE = 5;
+    const TIMEZONE = 4;
+    const BADGES = 5;
+    const COMPLETE = 6;
 
     const step = writable(WELCOME);
     let videoWrapperElement = null as HTMLElement;
@@ -30,6 +31,7 @@
             return null;
         }
     }).filter((value) => { return value !== null; }));
+    let timezone = '';
 
     const editableBadges = derived(badges, (badges) => {
         return badges.filter((badge) => { return badge.self_assigned; });
@@ -56,11 +58,7 @@
     const unsubscribeMessages = messages.subscribe((message) => {
         if (message.type === 'avatar-image-updated') {
             uploading = false;
-            if ($editableBadges.length > 0) {
-                step.set(BADGES);
-            } else {
-                step.set(COMPLETE);
-            }
+            step.set(TIMEZONE);
         } else if (message.type === 'avatar-image-update-failed') {
             uploading = false;
             uploadFailed = true;
@@ -113,6 +111,21 @@
         fileUploadElement.click();
     }
 
+    function setTimezone(ev: Event) {
+        ev.preventDefault();
+        sendMessage({
+            'type': 'update-user-profile',
+            'payload': {
+                'timezone': timezone,
+            }
+        });
+        if ($editableBadges.length > 0) {
+            step.set(BADGES);
+        } else {
+            step.set(COMPLETE);
+        }
+    }
+
     function setBadges(ev: Event) {
         ev.preventDefault();
         const roles = Object.entries(badgeSelection).map(([role, selected]) => {
@@ -135,6 +148,7 @@
         sendMessage({
             type: 'get-user'
         });
+        onboardingCompleted();
     }
 
     onDestroy(() => {
@@ -259,6 +273,18 @@
                             {/if}
                         </Button>
                     {/if}
+                </div>
+            </Dialog>
+            {:else if $step === TIMEZONE}
+            <Dialog class="bg-white">
+                <span slot="title">Select your Timezone</span>
+                <div slot="content">
+                    <p class="mb-4">Please select your timezone. This is used to show you all times in your local timezone.</p>
+                    <InputField type="select" bind:value={timezone} values={$timezones}>Your Timezone</InputField>
+                </div>
+                <div slot="actions" class="flex">
+                    <div class="flex-1"></div>
+                    <Button on:click={setTimezone} type="primary" class="flex-0">Set timezone</Button>
                 </div>
             </Dialog>
         {:else if $step === BADGES}

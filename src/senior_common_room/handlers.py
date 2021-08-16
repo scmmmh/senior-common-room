@@ -76,9 +76,13 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                 if message['type'] == 'authenticate':
                     await self.authenticate(message)
                 elif message['type'] == 'get-rooms-config':
-                    await self.get_rooms_config(message)
+                    await self.get_rooms_config()
                 elif message['type'] == 'get-badges-config':
-                    await self.get_badges_config(message)
+                    await self.get_badges_config()
+                elif message['type'] == 'get-timezones-config':
+                    await self.get_timezones_config()
+                elif message['type'] == 'get-schedule-config':
+                    await self.get_schedule_config()
                 elif message['type'] == 'get-user':
                     await self.get_user(message)
                 elif message['type'] == 'update-user-profile':

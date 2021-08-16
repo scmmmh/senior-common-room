@@ -1,6 +1,7 @@
 <script lang="ts">
     export let type = 'text';
     export let value: string | boolean;
+    export let values = [] as string[];
     export let keyPropagation = false;
     export let error = '';
 
@@ -34,6 +35,14 @@
         {#if error !== ''}
             <span class="block pt-1 text-red-600 text-sm">{error}</span>
         {/if}
+    </label>
+{:else if type === 'select'}
+    <label class="block mb-4"><slot></slot>
+        <select class="border-1 border-gray-200 text-black px-2 py-2 w-full" on:blur={changeValue} on:change={changeValue}>
+            {#each values as option_value}
+                <option value={option_value} selected={option_value === value ? 'selected' : null}>{option_value}</option>
+            {/each}
+        </select>
     </label>
 {:else}
     <label class="block mb-4">

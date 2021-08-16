@@ -1,4 +1,4 @@
-import { writable, derived } from "svelte/store";
+import { writable, derived, get } from "svelte/store";
 
 import { messages, sendMessage } from './connection';
 
@@ -17,7 +17,9 @@ messages.subscribe((message) => {
     } else if (message.type === 'onboarding-required') {
         onboardingState.set(ONBOARDING);
     } else if (message.type === 'user') {
-        onboardingState.set(ONBOARDED);
+        if (get(onboardingState) === STARTUP) {
+            onboardingState.set(ONBOARDED);
+        }
         user.set(message.payload as UserPayload);
     }
 });
@@ -29,3 +31,7 @@ export const isOnboarded = derived(onboardingState, (state) => {
 export const isOnboarding = derived(onboardingState, (state) => {
     return state === ONBOARDING;
 });
+
+export function onboardingCompleted() {
+    onboardingState.set(ONBOARDED);
+}

@@ -1,10 +1,11 @@
 import { connect, sendMessage, messages, isConnecting, isConnected, isReconnecting, isFailed, isDisconnected, reconnectWait } from './connection';
 import { authenticate, isAuthenticationRequired, isAuthenticating, isAuthenticationTokenSent, isAuthenticated, isAuthenticationFailed } from './authentication';
-import { rooms, badges } from './config';
+import { rooms, badges, schedule, timezones } from './config';
 import { action, actionLabel, executeAction } from './action';
 import { overlay } from './overlay';
-import { user, isOnboarded, isOnboarding } from './user';
+import { user, isOnboarded, isOnboarding, onboardingCompleted } from './user';
 import { jitsiRoomUsers } from './jitsi';
+import { showSchedule } from './ui';
 
 export {
     connect,
@@ -26,10 +27,13 @@ export {
 
     rooms,
     badges,
+    timezones,
+    schedule,
 
     user,
     isOnboarded,
     isOnboarding,
+    onboardingCompleted,
 
     executeAction,
     action,
@@ -38,4 +42,6 @@ export {
     overlay,
 
     jitsiRoomUsers,
+
+    showSchedule,
 };

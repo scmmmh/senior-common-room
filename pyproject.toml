@@ -18,6 +18,7 @@ Pillow = "^8.3.1"
 asyncio-mqtt = "^0.9.1"
 PyJWT = "^2.1.0"
 bleach = "^3.3.1"
+dateparser = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 

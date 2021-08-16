@@ -2,7 +2,7 @@
 
 interface ApiMessage {
     type: string;
-    payload?: AuthenticatePayload | RoomConfigPayload[] | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | JitsiRoomUsersPayload | UpdateProfilePlayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload | BadgeConfigPayload[] | BroadcastMessagePayload | UserMessagePayload | RequestVideoChatPayload;
+    payload?: AuthenticatePayload | RoomConfigPayload[] | ScheduleConfigPayload[] | TimezonesConfigPayload | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | JitsiRoomUsersPayload | UpdateProfilePlayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload | BadgeConfigPayload[] | BroadcastMessagePayload | UserMessagePayload | RequestVideoChatPayload;
 }
 
 interface AuthenticatePayload {
@@ -18,6 +18,21 @@ interface RoomConfigPayload {
     tilesets: TilesetPayload[];
 }
 
+interface TimezonesConfigPayload {
+    timezones: string[];
+}
+
+interface ScheduleConfigPayload {
+    title: string;
+    start_date: string;
+    start_time: string;
+    end_date: string;
+    end_time: string;
+    day_diff: number;
+    room: string | null;
+    description: string | null;
+}
+
 interface TilesetPayload {
     name: string;
     url: string;
@@ -30,6 +45,7 @@ interface UserPayload {
     avatar: string;
     roles: string[];
     blocked_users: number[];
+    timezone: string;
 }
 
 interface EnterJitsiRoomPayload {
@@ -107,5 +123,6 @@ interface JitsiRoomUsersPayload {
 interface UpdateProfilePlayload {
     name?: string;
     email?: string;
+    timezone?: string;
     roles?: string[];
 }

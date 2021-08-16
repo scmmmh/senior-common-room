@@ -6,6 +6,7 @@ import ConnectionStatus from './components/ConnectionStatus.svelte';
 import Authentication from './components/Authentication.svelte';
 import Room from './routes/Room.svelte';
 import Profile from './routes/Profile.svelte';
+import Schedule from './components/Schedule.svelte';
 import Overlay from './components/Overlay.svelte';
 import Onboarding from './components/Onboarding.svelte';
 import Admin from './components/Admin.svelte';
@@ -28,6 +29,7 @@ connect();
 					</div>
 					<Messages/>
 					<Overlay/>
+					<Schedule/>
 					{#if $user.roles.indexOf('admin') >= 0}
 						<Admin/>
 					{/if}

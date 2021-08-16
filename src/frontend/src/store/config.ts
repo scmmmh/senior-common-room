@@ -5,6 +5,8 @@ import { messages, sendMessage } from './connection';
 
 export const rooms = writable([] as RoomConfigPayload[]);
 export const badges = writable([] as BadgeConfigPayload[]);
+export const timezones = writable([] as string[]);
+export const schedule = writable([] as ScheduleConfigPayload[]);
 
 messages.subscribe((message) => {
     if (message.type === 'authenticated') {
@@ -14,12 +16,17 @@ messages.subscribe((message) => {
         sendMessage({
             type: 'get-badges-config'
         });
+        sendMessage({
+            type: 'get-timezones-config'
+        });
+        sendMessage({
+            type: 'get-schedule-config'
+        });
     } else if (message.type === 'rooms-config') {
-        const firstLoad = (get(rooms).length === 0);
         const pathElements = window.location.pathname.split('/');
         let redirect = true;
         if (pathElements.length > 0) {
-            if (pathElements[pathElements.length - 1] === 'profile') {
+            if (pathElements[pathElements.length - 1] === 'profile' || pathElements[pathElements.length - 1] === 'schedule') {
                 redirect = false;
             } else {
                 (message.payload as RoomConfigPayload[]).forEach((room) => {
@@ -35,5 +42,9 @@ messages.subscribe((message) => {
         }
     } else if (message.type === 'badges-config') {
         badges.set(message.payload as BadgeConfigPayload[]);
+    } else if (message.type === 'timezones-config') {
+        timezones.set((message.payload as TimezonesConfigPayload).timezones);
+    } else if (message.type === 'schedule-config') {
+        schedule.set(message.payload as ScheduleConfigPayload[])
     }
 });

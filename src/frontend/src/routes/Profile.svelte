@@ -2,7 +2,7 @@
     import { onDestroy, tick } from 'svelte';
     import { writable, derived } from 'svelte/store';
 
-    import { user, sendMessage, messages, badges } from '../store';
+    import { user, sendMessage, messages, badges, timezones } from '../store';
     import InputField from '../components/InputField.svelte';
     import Button from '../components/Button.svelte';
     import Dialog from '../components/Dialog.svelte';
@@ -22,6 +22,7 @@
     let uploadFailed = false;
     let name = $user.name;
     let email = $user.email;
+    let timezone = $user.timezone;
     let selectedBadges = Object.fromEntries($badges.map((badge) => {
         if (badge.self_assigned) {
             return [badge.role, $user.roles.indexOf(badge.role) >= 0];
@@ -51,6 +52,7 @@
             'payload': {
                 'name': name,
                 'email': email,
+                'timezone': timezone,
                 'roles': roles,
             }
         });
@@ -63,6 +65,7 @@
         ev.preventDefault();
         name = $user.name;
         email = $user.email;
+        timezone = $user.timezone;
         selectedBadges = Object.fromEntries($badges.map((badge) => {
             if (badge.self_assigned) {
                 return [badge.role, $user.roles.indexOf(badge.role) >= 0];
@@ -177,6 +180,7 @@
             <form class="flex-1 pl-10 max-w-lg" on:submit={updateProfile}>
                 <InputField type="text" bind:value={name}>Name</InputField>
                 <InputField type="text" bind:value={email}>E-Mail Address</InputField>
+                <InputField type="select" bind:value={timezone} values={$timezones}>Your Timezone</InputField>
                 {#if $editableBadges.length > 0}
                     <span class="block uppercase tracking-wider text-sm pb-1">Badges</span>
                     {#each $editableBadges as badge}
