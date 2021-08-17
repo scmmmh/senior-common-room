@@ -223,7 +223,7 @@
                     <span slot="title">{#if avatarData}Update your avatar (3/3){:else}Update your avatar (2/3){/if}</span>
                     <div slot="content">
                         {#if !videoStream}
-                            <p class="mb-3">Please allow the Senior Common Room to access your camera.</p>
+                            <p class="mb-3">Please allow {$coreConfig.title} to access your camera.</p>
                         {/if}
                         <div bind:this={videoWrapperElement}>
                             <video bind:this={videoElement} style="clip-path: circle(96px at center)">Video stream not available</video>

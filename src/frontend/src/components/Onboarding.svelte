@@ -2,7 +2,7 @@
     import { tick, onDestroy } from 'svelte';
     import { writable, derived } from 'svelte/store';
 
-    import { messages, badges, sendMessage, isOnboarding, timezones, onboardingCompleted } from '../store';
+    import { messages, badges, sendMessage, isOnboarding, timezones, onboardingCompleted, coreConfig } from '../store';
     import Dialog from './Dialog.svelte';
     import Button from './Button.svelte';
     import InputField from './InputField.svelte';
@@ -161,9 +161,9 @@
     {#if $isOnboarding}
         {#if $step === WELCOME}
             <Dialog class="bg-white">
-                <span slot="title">Welcome to the Senior Common Room</span>
+                <span slot="title">Welcome to {$coreConfig.title}</span>
                 <div slot="content">
-                    <p class="mb-3">We just need to go through a few small setup steps before you can get into the Senior Common Room.</p>
+                    <p class="mb-3">We just need to go through a few small setup steps before you can enter {$coreConfig.title}.</p>
                 </div>
                 <div slot="actions">
                     <Button on:click={() => { step.set(AVATAR); }} type="primary">Get started</Button>
@@ -185,7 +185,7 @@
                 <span slot="title">{#if avatarData}Setup your avatar (3/3){:else}Setup your avatar (2/3){/if}</span>
                 <div slot="content">
                     {#if !videoStream}
-                        <p class="mb-3">Please allow the Senior Common Room to access your camera.</p>
+                        <p class="mb-3">Please allow {$coreConfig.title} to access your camera.</p>
                     {/if}
                     <div bind:this={videoWrapperElement}>
                         <video bind:this={videoElement} style="clip-path: circle(96px at center)">Video stream not available</video>
@@ -304,9 +304,9 @@
             </Dialog>
         {:else if $step === COMPLETE}
             <Dialog class="bg-white">
-                <span slot="title">Enter the Senior Common Room</span>
+                <span slot="title">Enter {$coreConfig.title}</span>
                 <div slot="content">
-                    <p class="mb-2">You are all set up. When you enter the Senior Common Room you can move your avatar around the rooms using the cursor keys.</p>
+                    <p class="mb-2">You are all set up. When you enter {$coreConfig.title} you can move your avatar around the rooms using the cursor keys.</p>
                     <p class="mb-2">Some areas in the rooms have actions. When you move into such an area, a text describing the action is shown at the bottom of the screen. Press the Enter or Space key to run the action.</p>
                 </div>
                 <div slot="actions">
@@ -316,7 +316,7 @@
         {/if}
     {:else}
         <Dialog class="bg-white">
-            <span slot="title">Entering the Senior Common Room</span>
+            <span slot="title">Entering {$coreConfig.title}</span>
         </Dialog>
     {/if}
 </div>

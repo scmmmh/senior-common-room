@@ -21,6 +21,21 @@ def parse_datetime(value: str):
 
 
 CONFIG_SCHEMA = {
+    'core': {
+        'type': 'dict',
+        'schema': {
+            'title': {
+                'type': 'string',
+                'required': False,
+                'empty': False,
+                'nullable': True,
+                'default': 'The Senior Common Room'
+            }
+        },
+        'default': {
+            'title': 'The Senior Common Room'
+        }
+    },
     'database': {
         'type': 'dict',
         'required': True,

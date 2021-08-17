@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { isConnecting, isReconnecting, isFailed, isDisconnected, connect, reconnectWait } from '../store';
+    import { isConnecting, isReconnecting, isFailed, isDisconnected, connect, reconnectWait, coreConfig } from '../store';
 
     import Dialog from './Dialog.svelte';
     import Button from './Button.svelte';
@@ -20,13 +20,13 @@
         </span>
         <div slot="content">
             {#if $isConnecting}
-                You are being connected to the Senior Common Room. Please wait...
+                You are being connected to {$coreConfig.title}. Please wait...
             {:else if $isReconnecting}
-                You are being reconnected to the Senior Common Room. Please wait...
+                You are being reconnected to the {$coreConfig.title}. Please wait...
             {:else if $isFailed}
-                The connection to the Senior Common Room has failed. <Button on:click={connect}>Click here to attempt to reconnect.</Button>
+                The connection to the {$coreConfig.title} has failed. <Button on:click={connect}>Click here to attempt to reconnect.</Button>
             {:else if $isDisconnected}
-                The connection to the Senior Common Room has been lost. You will be reconnected automatically in {$reconnectWait} second{#if $reconnectWait > 1}s{/if}.
+                The connection to the {$coreConfig.title} has been lost. The system will try to automatically reconnect in {$reconnectWait} second{#if $reconnectWait > 1}s{/if}.
             {/if}
         </div>
     </Dialog>

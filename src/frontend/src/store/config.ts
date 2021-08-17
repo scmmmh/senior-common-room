@@ -3,6 +3,7 @@ import { navigate } from 'svelte-navigator';
 
 import { messages, sendMessage } from './connection';
 
+export const coreConfig = writable({} as CoreConfigPayload);
 export const rooms = writable([] as RoomConfigPayload[]);
 export const badges = writable([] as BadgeConfigPayload[]);
 export const timezones = writable([] as string[]);
@@ -10,6 +11,9 @@ export const schedule = writable([] as ScheduleConfigPayload[]);
 
 messages.subscribe((message) => {
     if (message.type === 'authenticated') {
+        sendMessage({
+            type: 'get-core-config'
+        });
         sendMessage({
             type: 'get-rooms-config'
         });
@@ -22,6 +26,9 @@ messages.subscribe((message) => {
         sendMessage({
             type: 'get-schedule-config'
         });
+    } else if (message.type === 'core-config') {
+        coreConfig.set(message.payload as CoreConfigPayload);
+        document.title = (message.payload as CoreConfigPayload).title;
     } else if (message.type === 'rooms-config') {
         const pathElements = window.location.pathname.split('/');
         let redirect = true;

@@ -75,6 +75,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
             if 'type' in message:
                 if message['type'] == 'authenticate':
                     await self.authenticate(message)
+                elif message['type'] == 'get-core-config':
+                    await self.get_core_config()
                 elif message['type'] == 'get-rooms-config':
                     await self.get_rooms_config()
                 elif message['type'] == 'get-badges-config':

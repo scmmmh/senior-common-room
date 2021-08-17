@@ -8,6 +8,12 @@ logger = logging.getLogger(__name__)
 
 class ConfigMixin():
 
+    async def get_core_config(self):
+        await self.send_message({
+            'type': 'core-config',
+            'payload': self.config['core']
+        })
+
     async def get_rooms_config(self):
         await self.send_message({
             'type': 'rooms-config',

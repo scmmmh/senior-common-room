@@ -11,6 +11,10 @@ interface AuthenticatePayload {
     token?: string;
 }
 
+interface CoreConfigPayload {
+    title: string;
+}
+
 interface RoomConfigPayload {
     slug: string;
     label: string;
