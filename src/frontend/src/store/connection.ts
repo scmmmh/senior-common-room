@@ -40,6 +40,9 @@ export function connect() {
         connection.addEventListener('open', () => {
             reconnectCount = MAX_RECONNECT_ATTEMPTS + 1;
             connectionStatus.set(CONNECTED);
+            sendMessage({
+                type: 'get-core-config'
+            });
         });
         connection.addEventListener('close', () => {
             window.clearTimeout(pingTimeout);

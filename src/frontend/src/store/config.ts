@@ -12,9 +12,6 @@ export const schedule = writable([] as ScheduleConfigPayload[]);
 messages.subscribe((message) => {
     if (message.type === 'authenticated') {
         sendMessage({
-            type: 'get-core-config'
-        });
-        sendMessage({
             type: 'get-rooms-config'
         });
         sendMessage({
