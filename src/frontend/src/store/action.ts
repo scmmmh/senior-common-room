@@ -18,11 +18,24 @@ export const actionLabel = derived(action, (action) => {
             return 'Start chatting';
         } else if (action.action === 'showIframe') {
             return 'View some content';
+        } else if (action.action === 'openNewTab') {
+            return 'View content in a new tab';
         } else {
             console.log(action);
         }
     } else {
         return '';
+    }
+});
+
+executeAction.subscribe((action) => {
+    if (action) {
+        if (action.action === 'openNewTab') {
+            let newWin = window.open(action.url, '_blank', 'noopener,noreferrer');
+            if (newWin) {
+                newWin.focus()
+            }
+        }
     }
 });
 
