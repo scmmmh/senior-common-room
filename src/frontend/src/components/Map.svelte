@@ -212,13 +212,13 @@
             update(time, delta) {
                 let xDelta = 0;
                 let yDelta = 0;
-                if (this.input.keyboard.checkDown(this.cursors.left, 100) && this.avatar.x > 0) {
+                if (this.input.keyboard.checkDown(this.cursors.left, 100)) {
                     xDelta = -1;
-                } else if (this.input.keyboard.checkDown(this.cursors.right, 100) && this.avatar.x < 26) {
+                } else if (this.input.keyboard.checkDown(this.cursors.right, 100)) {
                     xDelta = 1;
-                } else if (this.input.keyboard.checkDown(this.cursors.up, 100) && this.avatar.y > 0) {
+                } else if (this.input.keyboard.checkDown(this.cursors.up, 100)) {
                     yDelta = -1;
-                } else if (this.input.keyboard.checkDown(this.cursors.down, 100) && this.avatar.y < 26) {
+                } else if (this.input.keyboard.checkDown(this.cursors.down, 100)) {
                     yDelta = 1;
                 } else if ((this.input.keyboard.checkDown(this.enterKey, 500) || this.input.keyboard.checkDown(this.spaceKey)) && $action) {
                     executeAction.set($action);
