@@ -3,7 +3,7 @@ import { navigate } from 'svelte-navigator';
 
 import { messages, sendMessage } from './connection';
 
-export const coreConfig = writable({} as CoreConfigPayload);
+export const coreConfig = writable({'title': 'The Senior Common Room'} as CoreConfigPayload);
 export const rooms = writable([] as RoomConfigPayload[]);
 export const badges = writable([] as BadgeConfigPayload[]);
 export const timezones = writable([] as string[]);
