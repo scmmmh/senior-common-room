@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "senior-common-room"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["Mark Hall <mark.hall@open.ac.uk>"]
 license = "MIT"
@@ -21,6 +21,8 @@ bleach = "^3.3.1"
 dateparser = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+pytest-tornado = "^0.8.1"
 
 [tool.poetry.extras]
 postgresql = ["asyncpg"]
