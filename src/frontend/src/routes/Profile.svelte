@@ -2,7 +2,7 @@
     import { onDestroy, tick } from 'svelte';
     import { writable, derived } from 'svelte/store';
 
-    import { user, sendMessage, messages, badges, timezones } from '../store';
+    import { user, sendMessage, messages, badges, timezones, coreConfig } from '../store';
     import InputField from '../components/InputField.svelte';
     import Button from '../components/Button.svelte';
     import Dialog from '../components/Dialog.svelte';
