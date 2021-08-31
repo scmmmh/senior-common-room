@@ -252,7 +252,7 @@
                         </div>
                         <p class="mb-2">You can always change your avatar later.</p>
                     {:else}
-                        <p>The photo you upload must be a PNG or JPEG image and must be square.</p>
+                        <p>The photo you upload must be a PNG or JPEG image and must be square. It must also be smaller than 10 MB.</p>
                         <div class="text-center mt-8 mb-12">
                             <Button on:click={uploadPhoto} type="primary">Upload a photo</Button>
                         </div>
