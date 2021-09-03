@@ -119,6 +119,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.block_user(message)
                 elif message['type'] == 'unblock-user':
                     await self.unblock_user(message)
+                elif message['type'] == 'ping':
+                    pass
                 else:
                     logger.debug(data)
             else:
