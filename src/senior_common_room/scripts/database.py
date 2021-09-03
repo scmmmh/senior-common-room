@@ -34,7 +34,7 @@ def create(ctx):
 async def create_user(config, email, name):
     async with create_sessionmaker(config['database']['dsn'])() as session:
         async with session.begin():
-            session.add(User(email=email, name=name, roles=[]))
+            session.add(User(email=email, name=name, roles=[], status='active'))
 
 
 @click.command()
