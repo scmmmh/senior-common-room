@@ -16,3 +16,4 @@ class User(Base):
     timezone = Column(String(length=255))
     roles = Column(NestedMutableJson)
     blocked_users = Column(NestedMutableJson)
+    status = Column(String(length=255))

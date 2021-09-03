@@ -27,7 +27,8 @@ class UserMixin():
                 async with self.sessionmaker() as session:
                     logger.debug(f'Logging in user {message["payload"]["email"]}')
                     query = select(User).filter(and_(User.email == message['payload']['email'],
-                                                     User.token == message['payload']['token']))
+                                                     User.token == message['payload']['token'],
+                                                     User.status == 'active'))
                     result = await session.execute(query)
                     user = result.scalars().first()
                     if user:
@@ -83,7 +84,7 @@ This e-mail is automatically generated. Please do not reply to it.
         await self.send_message({
             'type': 'authentication-failed',
             'payload': {
-                'email': 'E-mail address or Login Token invalid',
+                'email': 'E-mail address invalid, login token invalid, or account blocked',
             }
         })
 

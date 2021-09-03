@@ -66,6 +66,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.jitsi_room_user_list(json.loads(message.payload.decode()))
                 elif self.jitsi_room_name and message.topic == f'user/{self.user.id}/leave_jitsi_room':
                     await self.leave_jitsi_room()
+                elif message.topic == f'user/{self.user.id}/reconnect':
+                    self.close()
                 else:
                     logger.debug(message.topic)
 
