@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  database:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=devPWD
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+volumes:
+  postgres:
