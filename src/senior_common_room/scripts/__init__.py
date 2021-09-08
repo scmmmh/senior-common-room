@@ -259,6 +259,25 @@ CONFIG_SCHEMA = {
             }
         }
     },
+    'links': {
+        'type': 'list',
+        'default': [],
+        'schema': {
+            'type': 'dict',
+            'schema': {
+                'title': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                },
+                'url': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False,
+                }
+            }
+        }
+    },
     'logging': {
         'type': 'dict'
     }

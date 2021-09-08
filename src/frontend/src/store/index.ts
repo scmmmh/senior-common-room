@@ -1,6 +1,6 @@
 import { connect, sendMessage, messages, isConnecting, isConnected, isReconnecting, isFailed, isDisconnected, reconnectWait } from './connection';
 import { authenticate, isAuthenticationRequired, isAuthenticating, isAuthenticationTokenSent, isAuthenticated, isAuthenticationFailed } from './authentication';
-import { coreConfig, rooms, badges, schedule, timezones } from './config';
+import { coreConfig, rooms, badges, schedule, timezones, links } from './config';
 import { action, actionLabel, executeAction } from './action';
 import { overlay } from './overlay';
 import { user, isOnboarded, isOnboarding, onboardingCompleted } from './user';
@@ -30,6 +30,7 @@ export {
     badges,
     timezones,
     schedule,
+    links,
 
     user,
     isOnboarded,

@@ -2,7 +2,7 @@
 
 interface ApiMessage {
     type: string;
-    payload?: AuthenticatePayload | RoomConfigPayload[] | ScheduleConfigPayload[] | TimezonesConfigPayload | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | JitsiRoomUsersPayload | UpdateProfilePlayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload | BadgeConfigPayload[] | BroadcastMessagePayload | UserMessagePayload | RequestVideoChatPayload;
+    payload?: AuthenticatePayload | RoomConfigPayload[] | ScheduleConfigPayload[] | LinkConfigPayload[] | TimezonesConfigPayload | TilesetPayload | UserPayload | EnterJitsiRoomPayload | OpenJitsiRoomPayload | JitsiRoomUsersPayload | UpdateProfilePlayload | UpdateAvatarImagePayload | SetAvatarLocationPayload | UpdateAvatarLocationPayload | LeaveMapPayload | BadgeConfigPayload[] | BroadcastMessagePayload | UserMessagePayload | RequestVideoChatPayload;
 }
 
 interface AuthenticatePayload {
@@ -129,4 +129,9 @@ interface UpdateProfilePlayload {
     email?: string;
     timezone?: string;
     roles?: string[];
+}
+
+interface LinkConfigPayload {
+    title: string;
+    url: string;
 }

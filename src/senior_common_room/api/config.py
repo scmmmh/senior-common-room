@@ -32,6 +32,18 @@ class ConfigMixin():
                 'payload': []
             })
 
+    async def get_links_config(self):
+        if 'links' in self.config:
+            await self.send_message({
+                'type': 'links-config',
+                'payload': self.config['links']
+            })
+        else:
+            await self.send_message({
+                'type': 'links-config',
+                'payload': []
+            })
+
     async def get_schedule_config(self):
         tz = timezone('UTC')
         try:

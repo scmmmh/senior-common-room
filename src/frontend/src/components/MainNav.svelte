@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Link, useLocation } from "svelte-navigator";
+    import { link, Link, useLocation } from "svelte-navigator";
 
-    import { rooms, executeAction, user, schedule, showSchedule } from '../store';
+    import { rooms, executeAction, user, schedule, showSchedule, links} from '../store';
 
     const location = useLocation();
 
@@ -23,6 +23,11 @@
             <li role="presentation" class="flex-0"><Link to="/room/{room.slug}" class="block px-4 py-3 tracking-wider border-b-4 {$location.pathname.startsWith('/room/' + room.slug) ? 'border-yellow-300' : 'border-gray-700'} hover:border-yellow-300">{room.label}</Link></li>
         {/each}
         <li role="presentation" class="flex-1"></li>
+        {#if $links.length > 0}
+            {#each $links as link}
+                <li role="presentation" class="flex-0"><a href={link.url} target="_blank" class="block px-4 py-3 tracking-wider border-b-4 border-gray-700 hover:border-yellow-300">{link.title}</a></li>
+            {/each}
+        {/if}
         {#if $schedule.length > 0}
             <li role="presentation" class="flex-0"><button on:click={showScheduleClick} class="block px-4 py-3 tracking-wider border-b-4 border-gray-700 hover:border-yellow-300">Schedule</button></li>
         {/if}

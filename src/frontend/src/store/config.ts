@@ -8,6 +8,7 @@ export const rooms = writable([] as RoomConfigPayload[]);
 export const badges = writable([] as BadgeConfigPayload[]);
 export const timezones = writable([] as string[]);
 export const schedule = writable([] as ScheduleConfigPayload[]);
+export const links = writable([] as LinkConfigPayload[]);
 
 messages.subscribe((message) => {
     if (message.type === 'authenticated') {
@@ -22,6 +23,9 @@ messages.subscribe((message) => {
         });
         sendMessage({
             type: 'get-schedule-config'
+        });
+        sendMessage({
+            type: 'get-links-config'
         });
     } else if (message.type === 'core-config') {
         coreConfig.set(message.payload as CoreConfigPayload);
@@ -49,6 +53,8 @@ messages.subscribe((message) => {
     } else if (message.type === 'timezones-config') {
         timezones.set((message.payload as TimezonesConfigPayload).timezones);
     } else if (message.type === 'schedule-config') {
-        schedule.set(message.payload as ScheduleConfigPayload[])
+        schedule.set(message.payload as ScheduleConfigPayload[]);
+    } else if (message.type === 'links-config') {
+        links.set(message.payload as LinkConfigPayload[]);
     }
 });

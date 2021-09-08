@@ -87,6 +87,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.get_timezones_config()
                 elif message['type'] == 'get-schedule-config':
                     await self.get_schedule_config()
+                elif message['type'] == 'get-links-config':
+                    await self.get_links_config()
                 elif message['type'] == 'get-user':
                     await self.get_user(message)
                 elif message['type'] == 'update-user-profile':
