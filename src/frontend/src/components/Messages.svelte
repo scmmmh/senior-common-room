@@ -70,13 +70,13 @@
 
     function countdownLength(type: string): number {
         if (type === 'broadcast') {
-            return 30;
+            return 60;
         } else if (type === 'video-chat-invite') {
-            return 30;
+            return 60;
         } else if (type === 'user') {
-            return 15;
+            return 60;
         } else {
-            return 10;
+            return 30;
         }
     }
 
