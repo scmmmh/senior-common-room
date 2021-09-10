@@ -208,6 +208,10 @@ CONFIG_SCHEMA = {
                         'empty': False
                     }
                 }
+            },
+            'main': {
+                'type': 'boolean',
+                'default': True
             }
         }
     },

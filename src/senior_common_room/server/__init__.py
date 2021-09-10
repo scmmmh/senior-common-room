@@ -109,7 +109,7 @@ def start_web_server(config):
 
 def start_server(config):
     logger.info('Server starting up')
-    if 'jitsi' in config:
+    if 'jitsi' in config and 'main' in config['jitsi'] and config['jitsi']['main']:
         IOLoop.current().add_callback(jitsi_room_state_server, config)
     start_web_server(config)
     IOLoop.current().start()
