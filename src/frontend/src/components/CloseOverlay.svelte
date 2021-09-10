@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { onDestroy, tick } from 'svelte';
-
     import { overlay } from '../store';
 
     function hideOverlay() {

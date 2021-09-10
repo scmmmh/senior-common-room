@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { overlay, user, sendMessage } from '../store';
+    import { overlay, user, sendMessage, executeAction } from '../store';
     import CloseOverlay from './CloseOverlay.svelte';
     import Dialog from './Dialog.svelte';
 

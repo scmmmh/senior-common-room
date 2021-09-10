@@ -158,6 +158,7 @@
             private enterKey;
             private spaceKey;
             private avatars: {[x: number]: Avatar};
+            private clickPoint = null;
 
             constructor () {
                 super(config.slug);
@@ -222,6 +223,21 @@
                     yDelta = 1;
                 } else if ((this.input.keyboard.checkDown(this.enterKey, 500) || this.input.keyboard.checkDown(this.spaceKey)) && $action) {
                     executeAction.set($action);
+                } else if (this.input.activePointer.buttons === 1) {
+                    this.input.activePointer.updateWorldPoint(this.cameras.main);
+                    this.clickPoint = this.layers[this.map.getTileLayerNames()[0]].worldToTileXY(this.input.activePointer.worldX, this.input.activePointer.worldY);
+                } else if (this.input.activePointer.buttons === 0 && this.clickPoint !== null) {
+                    action.set(null);
+                    executeAction.set(null);
+                    this.map.getTileLayerNames().forEach((layerName) => {
+                        const tile = this.layers[layerName].getTileAt(this.clickPoint.x, this.clickPoint.y);
+                        const layer = this.map.getLayer(layerName);
+                        if (tile && layer && this.layerProperties[layerName] && this.layerProperties[layerName].action) {
+                            const properties = this.layerProperties[layerName];
+                            executeAction.set(properties);
+                        }
+                    });
+                    this.clickPoint = null;
                 }
                 if (xDelta !== 0 || yDelta !== 0) {
                     const blocked = this.map.getTileLayerNames().map((layerName) => {
