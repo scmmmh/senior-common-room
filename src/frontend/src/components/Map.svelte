@@ -23,6 +23,7 @@
     let myX = 0;
     let myY = 0;
     let canvas = null as HTMLCanvasElement;
+    let mouseOverAction = false;
 
     class Avatar {
 
@@ -239,6 +240,20 @@
                         }
                     });
                     this.clickPoint = null;
+                } else if (this.input.activePointer.event && this.input.activePointer.event.target === canvas && this.input.activePointer.event.type === 'mousemove') {
+                    const coords = this.layers[this.map.getTileLayerNames()[0]].worldToTileXY(this.input.activePointer.worldX, this.input.activePointer.worldY)
+                    let isMouseOverAction = false;
+                    this.map.getTileLayerNames().forEach((layerName) => {
+                        const tile = this.layers[layerName].getTileAt(coords.x, coords.y);
+                        const layer = this.map.getLayer(layerName);
+                        if (tile && layer && this.layerProperties[layerName] && this.layerProperties[layerName].action) {
+                            const properties = this.layerProperties[layerName];
+                            isMouseOverAction = true;
+                        }
+                    });
+                    if (isMouseOverAction !== mouseOverAction) {
+                        mouseOverAction = isMouseOverAction;
+                    }
                 }
                 if (xDelta !== 0 || yDelta !== 0) {
                     const blocked = this.map.getTileLayerNames().map((layerName) => {
@@ -490,5 +505,5 @@
     });
 </script>
 
-<div id="game" class="flex-1"></div>
+<div id="game" class="flex-1 {mouseOverAction ? 'cursor-pointer' : ''}"></div>
 <AvatarList avatars={avatarList} x={myX} y={myY}/>
