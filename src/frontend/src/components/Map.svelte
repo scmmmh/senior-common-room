@@ -236,7 +236,16 @@
                         const layer = this.map.getLayer(layerName);
                         if (tile && layer && this.layerProperties[layerName] && this.layerProperties[layerName].action) {
                             const properties = this.layerProperties[layerName];
-                            executeAction.set(properties);
+                            if (properties.action === 'switchRoom') {
+                                if (properties.targetLayer) {
+                                    navTargetLayer = properties.targetLayer;
+                                } else {
+                                    navTargetLayer = null;
+                                }
+                                navigate('/room/' + properties.roomSlug);
+                            } else {
+                                executeAction.set(properties);
+                            }
                         }
                     });
                     this.clickPoint = null;
@@ -301,6 +310,8 @@
                                     navTargetLayer = null;
                                 }
                                 navigate('/room/' + properties.roomSlug);
+                            } else {
+                                executeAction.set(properties);
                             }
                         } else {
                             action.set(properties);
