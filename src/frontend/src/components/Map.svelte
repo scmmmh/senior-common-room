@@ -256,7 +256,6 @@
                         const tile = this.layers[layerName].getTileAt(coords.x, coords.y);
                         const layer = this.map.getLayer(layerName);
                         if (tile && layer && this.layerProperties[layerName] && this.layerProperties[layerName].action) {
-                            const properties = this.layerProperties[layerName];
                             isMouseOverAction = true;
                         }
                     });
