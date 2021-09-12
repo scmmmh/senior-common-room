@@ -22,6 +22,7 @@
     let avatarList = [];
     let myX = 0;
     let myY = 0;
+    let canvas = null as HTMLCanvasElement;
 
     class Avatar {
 
@@ -223,7 +224,7 @@
                     yDelta = 1;
                 } else if ((this.input.keyboard.checkDown(this.enterKey, 500) || this.input.keyboard.checkDown(this.spaceKey)) && $action) {
                     executeAction.set($action);
-                } else if (this.input.activePointer.buttons === 1) {
+                } else if (this.input.activePointer.buttons === 1 && this.input.activePointer.event.target === canvas) {
                     this.input.activePointer.updateWorldPoint(this.cameras.main);
                     this.clickPoint = this.layers[this.map.getTileLayerNames()[0]].worldToTileXY(this.input.activePointer.worldX, this.input.activePointer.worldY);
                 } else if (this.input.activePointer.buttons === 0 && this.clickPoint !== null) {
@@ -394,6 +395,7 @@
         $rooms.forEach((roomConfig) => {
             game.scene.add(roomConfig.slug, createRoom(roomConfig), roomConfig.slug === $params.rid);
         });
+        canvas = game.canvas;
         lastScene = $params.rid;
         sendMessage({
             type: 'enter-room',
