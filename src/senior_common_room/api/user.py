@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageOps
 from secrets import token_hex
 from sqlalchemy import and_
 from sqlalchemy.future import select
-from tornado.ioloop import IOLoop
+from urllib.parse import quote_plus
 
 from ..models import User
 
@@ -59,7 +59,7 @@ class UserMixin():
 
 Click on the following link or copy it into your browser to log into the Senior Common Room:
 
-{self.config['server']['base_url']}/frontend/?email={user.email}&token={user.token}&remember={str(message["payload"]["remember"])}
+{self.config['server']['base_url']}/frontend/?email={quote_plus(user.email)}&token={user.token}&remember={str(message["payload"]["remember"])}
 
 This e-mail is automatically generated. Please do not reply to it.
 ''')
