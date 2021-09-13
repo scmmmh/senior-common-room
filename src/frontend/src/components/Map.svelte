@@ -140,12 +140,22 @@
         }
 
         destroy() {
-            this.face.destroy();
-            this.text.destroy();
-            this.outline.destroy();
-            this.badges.forEach(([offsetX, offsetY, badge]) => {
-                badge.destroy();
-            });
+            if (this.face) {
+                this.face.destroy();
+            }
+            if (this.text) {
+                this.text.destroy();
+            }
+            if (this.outline) {
+                this.outline.destroy();
+            }
+            if (this.badges) {
+                this.badges.forEach(([offsetX, offsetY, badge]) => {
+                    if (badge) {
+                        badge.destroy();
+                    }
+                });
+            }
         }
     }
 
