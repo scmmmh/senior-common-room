@@ -25,6 +25,7 @@ class MessagesMixin():
         self.broadcast_messages_mqtt_task = asyncio.create_task(self.on_mqtt_messages(f'messages/broadcast'))
 
     async def send_broadcast_message(self, message):
+        # TODO: This needs permissions checking
         await self.mqtt.publish(f'messages/broadcast',
                                 payload=json.dumps({
                                     'message': safe_text(message['payload']['message'])

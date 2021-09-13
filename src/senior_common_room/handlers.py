@@ -10,13 +10,14 @@ from .api.jitsi import JitsiMixin
 from .api.user import UserMixin
 from .api.room import RoomMixin
 from .api.messages import MessagesMixin
+from .api.admin import AdminMixin
 from .models import create_sessionmaker
 
 
 logger = logging.getLogger(__name__)
 
 
-class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin, MessagesMixin):
+class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin, MessagesMixin, AdminMixin):
 
     def initialize(self, config):
         self.config = config
@@ -32,6 +33,7 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
         await self.mqtt.connect(timeout=5)
         await self.send_message({'type': 'authentication-required'})
         await self.setup_messages_task()
+        await self.setup_admin_messages_task()
         logger.debug('Websocket connection opened')
 
     def on_close(self):
@@ -42,6 +44,7 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
         if self.room_mqtt_task:
             self.room_mqtt_task.cancel()
         self.teardown_messages_task()
+        self.teardown_admin_task()
         IOLoop.current().add_callback(self.teardown_room)
         IOLoop.current().add_callback(self.mqtt.disconnect)
 
@@ -56,7 +59,7 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.room_update_avatar_location(json.loads(message.payload.decode()))
                 elif message.topic.startswith('room/') and message.topic.endswith('/leave'):
                     await self.room_remove_avatar(json.loads(message.payload.decode()))
-                elif message.topic.startswith('messages/'):
+                elif message.topic == 'messages/broadcast':
                     await self.receive_broadcast_message(json.loads(message.payload.decode()))
                 elif message.topic == f'user/{self.user.id}/message':
                     await self.receive_user_message(json.loads(message.payload.decode()))
@@ -68,6 +71,8 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.leave_jitsi_room()
                 elif message.topic == f'user/{self.user.id}/reconnect':
                     self.close()
+                elif message.topic == 'messages/admin':
+                    await self.receive_ui_reload()
                 else:
                     logger.debug(message.topic)
 
@@ -107,8 +112,6 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.room_set_avatar_location(message)
                 elif message['type'] == 'leave-room':
                     await self.leave_room(message)
-                elif message['type'] == 'broadcast-message':
-                    await self.send_broadcast_message(message)
                 elif message['type'] == 'user-message':
                     await self.send_user_message(message)
                 elif message['type'] == 'request-video-chat-message':
@@ -121,6 +124,10 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
                     await self.block_user(message)
                 elif message['type'] == 'unblock-user':
                     await self.unblock_user(message)
+                elif message['type'] == 'broadcast-message':
+                    await self.send_broadcast_message(message)
+                elif message['type'] == 'admin-ui-reload':
+                    await self.send_ui_reload()
                 elif message['type'] == 'ping':
                     pass
                 else:

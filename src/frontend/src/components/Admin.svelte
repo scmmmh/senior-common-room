@@ -1,32 +1,16 @@
 <script lang="ts">
     import Button from './Button.svelte';
-    import Modal from './Modal.svelte';
-    import Dialog from './Dialog.svelte';
-    import InputField from './InputField.svelte';
     import SendMessage from './SendMessage.svelte';
     import { sendMessage } from '../store';
 
     let visible = false;
 
     let showSendBroadcast = false;
-    let broadcastMessage = '';
-    let broadcastError = '';
 
-    function sendBroadcastMessage(ev) {
-        ev.preventDefault();
-        if (broadcastMessage.trim() !== '') {
-            sendMessage({
-                type: 'broadcast-message',
-                payload: {
-                    message: broadcastMessage.trim(),
-                }
-            });
-            broadcastError = '';
-            showSendBroadcast = false;
-            visible = false;
-        } else {
-            broadcastError = 'Please provide a message';
-        }
+    function forceUIReload() {
+        sendMessage({
+            type: 'admin-ui-reload'
+        });
     }
 </script>
 
@@ -43,7 +27,8 @@
         {#if visible}
             <nav>
                 <ul>
-                    <li><Button type="primary-outline" on:click={() => { broadcastMessage = ''; showSendBroadcast = true; }}>Send broadcast message</Button></li>
+                    <li class="mb-4"><Button type="primary-outline" on:click={() => { showSendBroadcast = true; }}>Send broadcast message</Button></li>
+                    <li class="mb-4"><Button type="primary-outline" on:click={forceUIReload}>Force UI reload</Button></li>
                 </ul>
             </nav>
             {#if showSendBroadcast}

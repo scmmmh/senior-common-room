@@ -95,3 +95,9 @@ export function sendMessage(message: ApiMessage) {
         }, 30000);
     }
 }
+
+messages.subscribe((message) => {
+    if (message && message.type === 'ui-reload') {
+        window.location.reload();
+    }
+});
