@@ -25,8 +25,8 @@ class UserMixin():
         if 'payload' in message and 'email' in message['payload'] and 'remember' in message['payload']:
             if 'token' in message['payload']:
                 async with self.sessionmaker() as session:
-                    logger.debug(f'Logging in user {message["payload"]["email"]}')
-                    query = select(User).filter(and_(User.email == message['payload']['email'],
+                    logger.debug(f'Logging in user {message["payload"]["email"].lower()}')
+                    query = select(User).filter(and_(User.email == message['payload']['email'].lower(),
                                                      User.token == message['payload']['token'],
                                                      User.status == 'active'))
                     result = await session.execute(query)
@@ -36,7 +36,7 @@ class UserMixin():
                         await self.send_message({
                             'type': 'authenticated',
                             'payload': {
-                                'email': message['payload']['email'],
+                                'email': message['payload']['email'].lower(),
                                 'remember': message['payload']['remember'],
                                 'token': message['payload']['token'],
                             }
@@ -45,8 +45,8 @@ class UserMixin():
                         return
             else:
                 async with self.sessionmaker() as session:
-                    logger.debug(f'Finding user {message["payload"]["email"]}')
-                    query = select(User).filter(User.email == message['payload']['email'])
+                    logger.debug(f'Finding user {message["payload"]["email"].lower()}')
+                    query = select(User).filter(User.email == message['payload']['email'].lower())
                     result = await session.execute(query)
                     user = result.scalars().first()
                     if user:
