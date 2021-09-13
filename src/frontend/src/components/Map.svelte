@@ -442,6 +442,7 @@
 
     const unsubscribeParams = params.subscribe((params) => {
         if (game) {
+            avatarList = [];
             if (lastScene && game.scene.getScene(lastScene)) {
                 game.scene.getScene(lastScene).sys.setVisible(false);
                 game.scene.pause(lastScene);
