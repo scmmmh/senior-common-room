@@ -10,6 +10,7 @@
     let currentMessages = [];
     let nextMessageId = 1;
     let showUserMessage = false;
+    let alert = null as HTMLAudioElement;
 
     const jitsiRoom = derived(overlay, (overlay) => {
         if (overlay && overlay.type === 'jitsi-room') {
@@ -24,6 +25,9 @@
 
     const unsubscribeMessages = messages.subscribe((message) => {
         if (message.type === 'broadcast-message') {
+            if (alert) {
+                alert.play();
+            }
             currentMessages.push({
                 id: nextMessageId,
                 payload: {
@@ -34,6 +38,9 @@
             currentMessages = currentMessages;
             nextMessageId = nextMessageId + 1;
         } else if (message.type === 'user-message') {
+            if (alert) {
+                alert.play();
+            }
             currentMessages.push({
                 id: nextMessageId,
                 payload: {
@@ -45,6 +52,9 @@
             currentMessages = currentMessages;
             nextMessageId = nextMessageId + 1;
         } else if (message.type === 'request-video-chat') {
+            if (alert) {
+                alert.play();
+            }
             currentMessages.push({
                 id: nextMessageId,
                 payload: {
@@ -158,4 +168,5 @@
             </Message>
         {/each}
     </ol>
+    <audio bind:this={alert} src="/frontend/alert.wav"></audio>
 </div>
