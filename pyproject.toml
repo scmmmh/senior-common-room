@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "senior-common-room"
-version = "0.6.4"
+version = "0.7.0"
 description = ""
 authors = ["Mark Hall <mark.hall@open.ac.uk>"]
 license = "MIT"
