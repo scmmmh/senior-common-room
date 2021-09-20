@@ -19,15 +19,18 @@ def database() -> None:
     pass
 
 
-async def create_database(config: dict) -> None:
+async def create_database(config: dict, drop_existing: bool) -> None:
     """Asynchronously create the database.
 
     :param config: The configuration to use.
     :type config: dict
+    :drop_existing: Whether to drop existing database tables.
+    :type drop_existing: bool
     """
     async with create_engine(config['database']['dsn']).begin() as conn:
-        logger.debug('Dropping existing database tables')
-        await conn.run_sync(Base.metadata.drop_all)
+        if drop_existing:
+            logger.debug('Dropping existing database tables')
+            await conn.run_sync(Base.metadata.drop_all)
         logger.debug('Creating database tables')
         await conn.run_sync(Base.metadata.create_all)
     logger.debug('Database created')
@@ -35,13 +38,16 @@ async def create_database(config: dict) -> None:
 
 @click.command()
 @click.pass_context
-def create(ctx: click.Context) -> None:
+@click.option('--drop-existing', is_flag=True, default=False, help='Drop any existing database tables')
+def create(ctx: click.Context, drop_existing: bool) -> None:
     """Create the database.
 
     :param ctx: The command context containing the configuration settings.
     :type ctx: click.Context
+    :drop_existing: Whether to drop existing database tables.
+    :type drop_existing: bool
     """
-    asyncio.run(create_database(ctx.obj['config']))
+    asyncio.run(create_database(ctx.obj['config'], drop_existing))
 
 
 """
