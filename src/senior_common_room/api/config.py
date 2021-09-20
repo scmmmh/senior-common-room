@@ -1,3 +1,5 @@
+"""Old code.
+
 import logging
 
 from pytz import timezone, common_timezones
@@ -82,3 +84,4 @@ class ConfigMixin():
                 'timezones': common_timezones
             }
         })
+""" # noqa

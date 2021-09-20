@@ -1,3 +1,4 @@
+"""Models related to the user."""
 from sqlalchemy import (Column, Integer, String)
 from sqlalchemy_json import NestedMutableJson
 
@@ -5,6 +6,7 @@ from .meta import Base
 
 
 class User(Base):
+    """Database model representing the user."""
 
     __tablename__ = 'users'
 

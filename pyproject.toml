@@ -23,6 +23,10 @@ dateparser = "^1.0.0"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
 pytest-tornado = "^0.8.1"
+flake8 = "^3.9.2"
+flake8-print = "^4.0.0"
+flake8-docstrings = "^1.6.0"
+flake8-annotations = "^2.6.2"
 
 [tool.poetry.extras]
 postgresql = ["asyncpg"]

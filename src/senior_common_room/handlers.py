@@ -1,3 +1,5 @@
+"""Old code.
+
 import asyncio_mqtt
 import logging
 import json
@@ -143,3 +145,4 @@ class ApiHandler(WebSocketHandler, ConfigMixin, JitsiMixin, UserMixin, RoomMixin
     def check_origin(self, *args, **kwargs):
         # TODO: Enable only in dev mode
         return True
+"""

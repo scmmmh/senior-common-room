@@ -1,9 +1,10 @@
+"""Commands related to the servers."""
 import click
 
-from ..server import start_server
+# from ..server import start_server
 
 
-@click.command()
-@click.pass_context
-def server(ctx):
-    start_server(ctx.obj['config'])
+@click.group()
+def server() -> None:
+    """Server commands"""  # noqa: D400
+    pass

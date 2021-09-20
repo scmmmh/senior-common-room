@@ -1,3 +1,5 @@
+"""Old code.
+
 import asyncio
 import logging
 import smtplib
@@ -202,3 +204,4 @@ This e-mail is automatically generated. Please do not reply to it.
                 self.user.blocked_users.remove(message['payload']['user']['id'])
             await session.commit()
         await self.get_user(None)
+""" # noqa

@@ -1,3 +1,5 @@
+"""Old code.
+
 import asyncio
 import asyncio_mqtt
 import json
@@ -113,3 +115,4 @@ def start_server(config):
         IOLoop.current().add_callback(jitsi_room_state_server, config)
     start_web_server(config)
     IOLoop.current().start()
+"""

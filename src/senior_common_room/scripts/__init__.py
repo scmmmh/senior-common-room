@@ -1,3 +1,5 @@
+"""Senior Common Room Command-line interface."""
+
 import click
 import dateparser
 import logging.config
@@ -5,14 +7,22 @@ import os
 import yaml
 
 from cerberus import Validator
+from datetime import datetime
 from pytz import timezone
-from typing import Union
+from typing import Union, List
 
 from .server import server
 from .database import database
 
 
-def parse_datetime(value: str):
+def parse_datetime(value: str) -> datetime.DateTime:
+    """Parse a datetime string into a timezone-aware DateTime.
+
+    :param value: The datetime string to parse.
+    :type value: str
+    :return: The parsed, timezone-aware DateTime
+    :rtype: datetime.Datetime
+    """
     utc = timezone('UTC')
     return dateparser.parse(value, settings={
         'TIMEZONE': 'UTC',
@@ -289,13 +299,24 @@ CONFIG_SCHEMA = {
 
 
 def validate_config(config: dict) -> Union[list, dict]:
+    """Validate the given configuration dictionary.
+
+    Also applies all configuration normalisations.
+
+    Returns either the normalised and validated configuration or a list of configuration errors.
+
+    :param config: The configuration to validate.
+    :type config: dict
+    :return: Either a dictionary or a list of configuration errors.
+    :rtype: Union[list, dict]
+    """
     validator = Validator(CONFIG_SCHEMA)
     if validator.validate(config):
         return validator.normalized(config)
     else:
         error_list = []
 
-        def walk_error_tree(err, path):
+        def walk_error_tree(err: Union[dict, list, str], path: str) -> List[str]:
             if isinstance(err, dict):
                 for key, value in err.items():
                     walk_error_tree(value, path + (str(key), ))
@@ -311,7 +332,8 @@ def validate_config(config: dict) -> Union[list, dict]:
 
 @click.group()
 @click.pass_context
-def main(ctx):
+def main(ctx: click.Context) -> None:
+    """Senior-Common-Room commandline tool."""
     config = None
     if os.path.exists('config.yml'):
         with open('config.yml') as in_f:

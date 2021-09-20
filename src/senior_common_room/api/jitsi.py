@@ -1,3 +1,5 @@
+"""Old code.
+
 import asyncio
 import json
 import jwt
@@ -73,3 +75,4 @@ class JitsiMixin():
                                     }).encode())
         if self.jitsi_room_mqtt_task:
             self.jitsi_room_mqtt_task.cancel()
+""" # noqa

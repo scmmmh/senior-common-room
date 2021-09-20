@@ -1,3 +1,5 @@
+"""Old code.
+
 import asyncio
 import json
 import logging
@@ -64,3 +66,4 @@ class RoomMixin():
     async def teardown_room(self):
         if self.room_name:
             await self.leave_room(None)
+"""
