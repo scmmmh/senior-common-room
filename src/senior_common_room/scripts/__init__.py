@@ -2,12 +2,12 @@
 
 import click
 import dateparser
+import datetime
 import logging.config
 import os
 import yaml
 
 from cerberus import Validator
-from datetime import datetime
 from pytz import timezone
 from typing import Union, List
 
@@ -15,7 +15,7 @@ from .server import server
 from .database import database
 
 
-def parse_datetime(value: str) -> datetime.DateTime:
+def parse_datetime(value: str) -> datetime.datetime:
     """Parse a datetime string into a timezone-aware DateTime.
 
     :param value: The datetime string to parse.
