@@ -50,6 +50,6 @@ async def test_initial_authentication_required(http_server: HTTPServer, websocke
     """Test that the initial authentication request is sent."""
     await database()
     conn = await websocket
-    assert json.loads(await conn.read_message()) == {'type': 'authentication- required'}
+    assert json.loads(await conn.read_message()) == {'type': 'authentication-required'}
     conn.close()
     await asyncio.sleep(2)
