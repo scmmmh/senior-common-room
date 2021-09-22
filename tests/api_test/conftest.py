@@ -7,9 +7,9 @@ from collections import namedtuple
 from tornado.httpserver import HTTPServer
 from tornado.web import Application
 from tornado.websocket import WebSocketClientConnection, websocket_connect
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Union, List
 
-from senior_common_room.models import Base, create_engine
+from senior_common_room.models import Base, User, create_engine, create_sessionmaker
 from senior_common_room.servers.backend import create_application
 
 
@@ -29,11 +29,17 @@ def app() -> Application:
 @pytest.fixture
 def database() -> Awaitable:
     """Connect to the database, creating any needed database entries."""
-    async def create() -> None:
-        engine = create_engine(CONFIG['database']['dsn'])
-        async with engine.begin() as conn:
+    async def create(objects: Union[List[dict], None] = None) -> None:
+        async with create_engine(CONFIG['database']['dsn']).begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
-
+            if objects:
+                async with create_sessionmaker(engine=conn)() as session:
+                    async with session.begin():
+                        for data in objects:
+                            if data['type'] == 'users':
+                                obj = User.from_jsonapi(data)
+                                session.add(obj)
     return create
 
 
@@ -43,7 +49,7 @@ def websocket(base_url: str) -> Awaitable[WebSocketClientConnection]:
     return websocket_connect(base_url.replace('http', 'ws') + '/api/websocket')
 
 
-ApiClient = namedtuple('ApiClient', ['expect_message', 'close'])
+ApiClient = namedtuple('ApiClient', ['expect_message', 'send_message', 'close'])
 
 
 @pytest.fixture
@@ -71,12 +77,21 @@ def api_client(http_server: HTTPServer, websocket: Awaitable[WebSocketClientConn
                     close()
                     assert False, f'Message {json.dumps(msg)} not received within {timeout} seconds'
 
+        async def send_message(msg: dict) -> None:
+            """Send the given ``msg``.
+
+            :param msg: The message to send to the server
+            :type msg: dict
+            """
+            conn.write_message(json.dumps(msg))
+
         def close() -> None:
             """Close the connection."""
             conn.close()
 
         return ApiClient(**{
             'expect_message': expect_message,
+            'send_message': send_message,
             'close': close,
         })
 

@@ -16,6 +16,5 @@ def create_application(config: dict) -> Application:
         [
             (r'/api/websocket', WebsocketHandler, {'config': config}),
         ],
-        debug=True,
         websocket_max_message_size=14680064)
     return app

@@ -5,6 +5,7 @@ import json
 from tornado import websocket
 
 from .user import UserMixin
+from senior_common_room.models import create_sessionmaker
 
 
 mixins = ['user']
@@ -19,6 +20,7 @@ class WebsocketHandler(websocket.WebSocketHandler, UserMixin):
     def initialize(self, config: dict) -> None:  # noqa: ANN101
         """Initialise the handler."""
         self.config = config
+        self.Session = create_sessionmaker(dsn=config['database']['dsn'])
 
     async def open(self) -> None:  # noqa: ANN101
         """Handle opening the connection and calls any on_open mixins."""
@@ -28,7 +30,7 @@ class WebsocketHandler(websocket.WebSocketHandler, UserMixin):
 
     async def on_message(self, data: str) -> None:  # noqa: ANN101
         """Handle opening the connection and calls any on_message mixins."""
-        msg = json.parse(data)
+        msg = json.loads(data)
         for mixin in message_mixins:
             if hasattr(self, mixin):
                 await getattr(self, mixin)(msg)
