@@ -24,7 +24,7 @@ jobs:
         echo "PIPX_HOME=$HOME/.local/pipx" >> $GITHUB_ENV
         echo "PIPX_BIN_DIR=$HOME/.local/bin" >> $GITHUB_ENV
 
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
 
